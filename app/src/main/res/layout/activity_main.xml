@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity"
+    tools:ignore="ContentDescription,HardcodedText,RtlHardcoded,RtlSymmetry">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/colorPrimaryDarker"
+        android:orientation="vertical">
+
+        <android.support.design.widget.CoordinatorLayout
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="@color/colorPrimaryDark"
+            android:elevation="4dp"
+            android:orientation="horizontal">
+
+            <LinearLayout
+                android:id="@+id/timerll"
+                android:layout_width="120dp"
+                android:layout_height="45dp"
+                android:layout_gravity="center_vertical"
+                android:layout_marginLeft="12dp"
+                android:background="@drawable/timer_background"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:scaleType="center"
+                android:textColor="#FF0000"
+                android:textSize="48sp">
+
+                <TextView
+                    android:id="@+id/timer1"
+                    android:layout_width="60dp"
+                    android:layout_height="45dp"
+                    android:gravity="center"
+                    android:scaleType="center"
+                    android:textColor="#FF0000"
+                    android:textSize="48sp" />
+
+                <TextView
+                    android:id="@+id/timer2"
+                    android:layout_width="60dp"
+                    android:layout_height="45dp"
+                    android:gravity="center"
+                    android:scaleType="center"
+                    android:textColor="#FF0000"
+                    android:textSize="48sp" />
+
+            </LinearLayout>
+
+            <ImageButton
+                android:id="@+id/smiley"
+                android:layout_width="45dp"
+                android:layout_height="45dp"
+                android:layout_gravity="center"
+                android:layout_marginRight="12dp"
+                android:background="@drawable/smiley"
+                android:scaleType="center" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="45dp"
+                android:layout_gravity="center_vertical|right"
+                android:layout_marginRight="12dp">
+
+                <ImageButton
+                    android:id="@+id/switchPointer"
+                    android:layout_width="45dp"
+                    android:layout_height="45dp"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginRight="12dp"
+                    android:background="@drawable/bomb2"
+                    android:onClick="flagSwitch"
+                    android:scaleType="center" />
+
+                <TextView
+                    android:id="@+id/bombsCounter"
+                    android:layout_width="60dp"
+                    android:layout_height="45dp"
+                    android:layout_gravity="center_vertical|right"
+                    android:background="@drawable/bombs_counter_background"
+                    android:gravity="center"
+                    android:scaleType="center"
+                    android:textColor="#FF0000"
+                    android:textSize="48sp" />
+
+            </LinearLayout>
+
+        </android.support.design.widget.CoordinatorLayout>
+
+        <GridLayout
+            android:id="@+id/gl"
+            android:layout_width="wrap_content"
+            android:layout_height="1dp"
+            android:layout_gravity="center_horizontal"
+            android:orientation="horizontal" />
+
+    </LinearLayout>
+
+</android.support.design.widget.CoordinatorLayout>
