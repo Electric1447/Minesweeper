@@ -148,7 +148,7 @@ public class MainActivity extends AppCompatActivity {
         double screenWidth = size.x - pixels;
         double screenHeight = screenWidth / cols * rows;
         slotWidth = (int)(screenWidth / cols);
-        slotHeight = (int)(screenHeight / rows);;
+        slotHeight = (int)(screenHeight / rows);
 
         // Initializing the GridLayout;
         for (int i = 0; i < rows; i++)
@@ -499,19 +499,16 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void flagSwitch(View view) {
+    public void flagSwitch (View view) {
         flag = !flag;
-        if (flag) {
-            Drawable fDraw = getDrawable(R.drawable.flag);
-            assert fDraw != null;
-            fDraw.setFilterBitmap(false);
-            view.setBackground(fDraw);
-        } else {
-            Drawable bDraw = getDrawable(R.drawable.bomb2);
-            assert bDraw != null;
-            bDraw.setFilterBitmap(false);
-            view.setBackground(bDraw);
-        }
+        Drawable fDraw;
+        if (flag)
+            fDraw = getDrawable(R.drawable.flag);
+        else
+            fDraw = getDrawable(R.drawable.bomb2);
+        assert fDraw != null;
+        fDraw.setFilterBitmap(false);
+        view.setBackground(fDraw);
     }
 
 }
