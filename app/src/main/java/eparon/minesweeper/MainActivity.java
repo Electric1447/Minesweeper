@@ -23,14 +23,18 @@ import android.widget.TextView;
 import java.util.Locale;
 import java.util.Random;
 
+import eparon.minesweeper.Game.Cell;
+import eparon.minesweeper.Game.CellArray;
+
 @SuppressLint("ClickableViewAccessibility")
 public class MainActivity extends AppCompatActivity {
 
+    boolean firstTurn;
+    int firstCell;
+
     int rows = 18;
     int cols = 12;
-    int[][] cells = new int[rows][cols];
-    boolean[][] clicked = new boolean[rows][cols];
-    boolean[][] flagged = new boolean[rows][cols];
+    CellArray cells = new CellArray(rows, cols);
     int bombs = 60;
     int flags = bombs;
     boolean flag = false;
@@ -73,6 +77,8 @@ public class MainActivity extends AppCompatActivity {
     TextView BombsCounter;
     ImageView smiley;
 
+    Drawable cuaDrawable, flagDrawable, flag2Drawable, bombDrawable, smileyDrawable, smiley2Drawable, smiley3Drawable;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -96,10 +102,28 @@ public class MainActivity extends AppCompatActivity {
         BombsCounter.setBackground(bcDrawable);
 
         ImageView flagIV = findViewById(R.id.switchPointer);
-        Drawable bDraw = getDrawable(R.drawable.bomb2);
-        assert bDraw != null;
-        bDraw.setFilterBitmap(false);
-        flagIV.setBackground(bDraw);
+        cuaDrawable = getDrawable(R.drawable.cell_unassigned);
+        assert cuaDrawable != null;
+        cuaDrawable.setFilterBitmap(false);
+        flagDrawable = getDrawable(R.drawable.flag);
+        assert flagDrawable != null;
+        flagDrawable.setFilterBitmap(false);
+        flag2Drawable = getDrawable(R.drawable.flag2);
+        assert flag2Drawable != null;
+        flag2Drawable.setFilterBitmap(false);
+        bombDrawable = getDrawable(R.drawable.bomb2);
+        assert bombDrawable != null;
+        bombDrawable.setFilterBitmap(false);
+        smileyDrawable = getDrawable(R.drawable.smiley);
+        assert smileyDrawable != null;
+        smileyDrawable.setFilterBitmap(false);
+        smiley2Drawable = getDrawable(R.drawable.smiley2);
+        assert smiley2Drawable != null;
+        smiley2Drawable.setFilterBitmap(false);
+        smiley3Drawable = getDrawable(R.drawable.smiley3);
+        assert smiley3Drawable != null;
+        smiley3Drawable.setFilterBitmap(false);
+        flagIV.setBackground(bombDrawable);
 
         for (int i = 0; i < images.length; i++) {
             images[i] = getDrawable(imagesResID[i]);
@@ -108,19 +132,13 @@ public class MainActivity extends AppCompatActivity {
         }
 
         smiley = findViewById(R.id.smiley);
-        Drawable s1 = getDrawable(R.drawable.smiley);
-        assert s1 != null;
-        s1.setFilterBitmap(false);
-        smiley.setImageDrawable(s1);
+        smiley.setImageDrawable(smileyDrawable);
         smiley.setOnTouchListener(new OnTouchListener() {
             @Override
             public boolean onTouch(View arg0, MotionEvent arg1) {
                 switch (arg1.getAction()) {
                     case MotionEvent.ACTION_DOWN:
-                        Drawable s3 = getDrawable(R.drawable.smiley3);
-                        assert s3 != null;
-                        s3.setFilterBitmap(false);
-                        smiley.setImageDrawable(s3);
+                        smiley.setImageDrawable(smiley3Drawable);
                         break;
                     case MotionEvent.ACTION_UP:
                     case MotionEvent.ACTION_CANCEL:
@@ -128,10 +146,7 @@ public class MainActivity extends AppCompatActivity {
                         new Handler().postDelayed(new Runnable() {
                             @Override
                             public void run () {
-                                Drawable s1 = getDrawable(R.drawable.smiley);
-                                assert s1 != null;
-                                s1.setFilterBitmap(false);
-                                smiley.setImageDrawable(s1);
+                                smiley.setImageDrawable(smileyDrawable);
                             }
                         }, 50);
                         break;
@@ -166,6 +181,8 @@ public class MainActivity extends AppCompatActivity {
 
     private void Init() {
 
+        firstTurn = true;
+
         timerHandler.removeCallbacks(timerRunnable);
         startTime = System.currentTimeMillis();
         timerHandler.postDelayed(timerRunnable, 0);
@@ -179,188 +196,10 @@ public class MainActivity extends AppCompatActivity {
 
         for (int i = 0; i < rows; i++)
             for (int j = 0; j < cols; j++)
-                cells[i][j] = 0;
-
-        Random r = new Random();
-        int counter = 0;
-
-        while (bombs != 0) {
-            if (counter >= cols * rows)
-                counter = 0;
-
-            if (r.nextDouble() < 0.10 && cells[counter / cols][counter % cols] != -1) {
-                cells[counter / cols][counter % cols] = -1;
-                bombs--;
-            }
-            counter++;
-        }
-
-        // TopLeft
-        if (cells[0][0] != -1) {
-            // Right
-            if (cells[0][1] == -1)
-                cells[0][0]++;
-            // Bottom
-            if (cells[1][0] == -1)
-                cells[0][0]++;
-            // BottomRight
-            if (cells[1][1] == -1)
-                cells[0][0]++;
-        }
-
-        // TopRight
-        if (cells[0][cols - 1] != -1) {
-            // Left
-            if (cells[0][cols - 2] == -1)
-                cells[0][cols - 1]++;
-            // BottomLeft
-            if (cells[1][cols - 2] == -1)
-                cells[0][cols - 1]++;
-            // Bottom
-            if (cells[1][cols - 1] == -1)
-                cells[0][cols - 1]++;
-        }
-
-        // BottomLeft
-        if (cells[rows - 1][0] != -1) {
-            // Top
-            if (cells[rows - 2][0] == -1)
-                cells[rows - 1][0]++;
-            // TopRight
-            if (cells[rows - 2][1] == -1)
-                cells[rows - 1][0]++;
-            // Right
-            if (cells[rows - 1][1] == -1)
-                cells[rows - 1][0]++;
-        }
-
-        // BottomRight
-        if (cells[rows - 1][cols - 1] != -1) {
-            // TopLeft
-            if (cells[rows - 2][cols - 2] == -1)
-                cells[rows - 1][cols - 1]++;
-            // Top
-            if (cells[rows - 2][cols - 1] == -1)
-                cells[rows - 1][cols - 1]++;
-            // Left
-            if (cells[rows - 1][cols - 2] == -1)
-                cells[rows - 1][cols - 1]++;
-        }
-
-        for (int i = 1; i < rows - 1; i++) {
-
-            if (cells[i][0] != -1) {
-                // Top
-                if (cells[i - 1][0] == -1)
-                    cells[i][0]++;
-                // TopRight
-                if (cells[i - 1][1] == -1)
-                    cells[i][0]++;
-                // Right
-                if (cells[i][1] == -1)
-                    cells[i][0]++;
-                // Bottom
-                if (cells[i + 1][0] == -1)
-                    cells[i][0]++;
-                // BottomRight
-                if (cells[i + 1][1] == -1)
-                    cells[i][0]++;
-            }
-
-            if (cells[i][cols - 1] != -1) {
-                // TopLeft
-                if (cells[i - 1][cols - 2] == -1)
-                    cells[i][cols - 1]++;
-                // Top
-                if (cells[i - 1][cols - 1] == -1)
-                    cells[i][cols - 1]++;
-                // Left
-                if (cells[i][cols - 2] == -1)
-                    cells[i][cols - 1]++;
-                // BottomLeft
-                if (cells[i + 1][cols - 2] == -1)
-                    cells[i][cols - 1]++;
-                // Bottom
-                if (cells[i + 1][cols - 1] == -1)
-                    cells[i][cols - 1]++;
-            }
-
-            for (int j = 1; j < cols - 1; j++) {
-
-                if (!borderRowsChecked) {
-                    if (cells[0][j] != -1) {
-                        // Left
-                        if (cells[0][j - 1] == -1)
-                            cells[0][j]++;
-                        // Right
-                        if (cells[0][j + 1] == -1)
-                            cells[0][j]++;
-                        // BottomLeft
-                        if (cells[1][j - 1] == -1)
-                            cells[0][j]++;
-                        // Bottom
-                        if (cells[1][j] == -1)
-                            cells[0][j]++;
-                        // BottomRight
-                        if (cells[1][j + 1] == -1)
-                            cells[0][j]++;
-                    }
-
-                    if (cells[rows - 1][j] != -1) {
-                        // TopLeft
-                        if (cells[rows - 2][j - 1] == -1)
-                            cells[rows - 1][j]++;
-                        // Top
-                        if (cells[rows - 2][j] == -1)
-                            cells[rows - 1][j]++;
-                        // TopRight
-                        if (cells[rows - 2][j + 1] == -1)
-                            cells[rows - 1][j]++;
-                        // Left
-                        if (cells[rows - 1][j - 1] == -1)
-                            cells[rows - 1][j]++;
-                        // Right
-                        if (cells[rows - 1][j + 1] == -1)
-                            cells[rows - 1][j]++;
-                    }
-                }
-
-                if (cells[i][j] != -1) {
-                    // TopLeft
-                    if (cells[i - 1][j - 1] == -1)
-                        cells[i][j]++;
-                    // Top
-                    if (cells[i - 1][j] == -1)
-                        cells[i][j]++;
-                    // TopRight
-                    if (cells[i - 1][j + 1] == -1)
-                        cells[i][j]++;
-                    // Left
-                    if (cells[i][j - 1] == -1)
-                        cells[i][j]++;
-                    // Right
-                    if (cells[i][j + 1] == -1)
-                        cells[i][j]++;
-                    // BottomLeft
-                    if (cells[i + 1][j - 1] == -1)
-                        cells[i][j]++;
-                    // Bottom
-                    if (cells[i + 1][j] == -1)
-                        cells[i][j]++;
-                    // BottomRight
-                    if (cells[i + 1][j + 1] == -1)
-                        cells[i][j]++;
-                }
-            }
-
-            borderRowsChecked = true;
-        }
+                cells.getCell(i, j).resetState();
 
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < cols; j++) {
-
-                clicked[i][j] = false;
-                flagged[i][j] = false;
 
                 View v = View.inflate(this, R.layout.cell, null);
                 fl[i][j] = v.findViewById(R.id.fl);
@@ -375,15 +214,17 @@ public class MainActivity extends AppCompatActivity {
                 fl[i][j].setLayoutParams(lp);
                 gridLayout.addView(fl[i][j], lp);
 
-                Drawable cuaDraw = getDrawable(R.drawable.cell_unassigned);
-                assert cuaDraw != null;
-                cuaDraw.setFilterBitmap(false);
-                ib[i][j].setImageDrawable(cuaDraw);
+                ib[i][j].setImageDrawable(cuaDrawable);
 
                 final int finalI = i, finalJ = j;
                 ib[i][j].setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
+                        if (firstTurn) {
+                            firstTurn = false;
+                            firstCell = finalI * cols + finalJ;
+                            startBoardGeneration();
+                        }
                         revealCell(finalI, finalJ);
                     }
                 });
@@ -397,102 +238,98 @@ public class MainActivity extends AppCompatActivity {
         gridLayout.setLayoutParams(lp);
     }
 
+    private void startBoardGeneration() {
+
+        Random r = new Random();
+        int counter = 0;
+
+        while (bombs != 0) {
+            if (counter >= cols * rows)
+                counter = 0;
+
+            if (r.nextDouble() < 0.10 && !cells.getCell(counter / cols, counter % cols).isBomb()
+                    && counter != firstCell - 1 - cols && counter != firstCell - cols && counter != firstCell + 1 - cols
+                    && counter != firstCell - 1        && counter != firstCell        && counter != firstCell + 1
+                    && counter != firstCell - 1 + cols && counter != firstCell + cols && counter != firstCell + 1 + cols) {
+                cells.getCell(counter / cols, counter % cols).setValue(-1);
+                bombs--;
+            }
+            counter++;
+        }
+
+        cells.bombDetector();
+    }
+
     private void revealCell(int rowPos, int colPos) {
-        if (!clicked[rowPos][colPos]) {
+
+        // If it hasn't been clicked yet.
+        if (!cells.getCell(rowPos, colPos).isClicked()) {
             if (flag) {
-                if (!flagged[rowPos][colPos]) {
+                if (!cells.getCell(rowPos, colPos).isFlagged()) {
                     if (flags > 0) {
-                        Drawable fDraw = getDrawable(R.drawable.flag);
-                        assert fDraw != null;
-                        fDraw.setFilterBitmap(false);
-                        ib[rowPos][colPos].setImageDrawable(fDraw);
+                        ib[rowPos][colPos].setImageDrawable(flagDrawable);
                         flags--;
                     } else
-                        flagged[rowPos][colPos] = !flagged[rowPos][colPos];
+                        cells.getCell(rowPos, colPos).setFlagged(!cells.getCell(rowPos, colPos).isFlagged());
                 } else {
-                    Drawable cuaDraw = getDrawable(R.drawable.cell_unassigned);
-                    assert cuaDraw != null;
-                    cuaDraw.setFilterBitmap(false);
-                    ib[rowPos][colPos].setImageDrawable(cuaDraw);
+                    ib[rowPos][colPos].setImageDrawable(cuaDrawable);
                     flags++;
                 }
                 BombsCounter.setText(String.format(Locale.getDefault(), "%02d", flags));
-                flagged[rowPos][colPos] = !flagged[rowPos][colPos];
-            } else if (!flagged[rowPos][colPos]) {
-                clicked[rowPos][colPos] = true;
-                switch (cells[rowPos][colPos]) {
+                cells.getCell(rowPos, colPos).setFlagged(!cells.getCell(rowPos, colPos).isFlagged());
+            } else if (!cells.getCell(rowPos, colPos).isFlagged()) {
+
+                cells.getCell(rowPos, colPos).setClicked(true);
+
+                switch (cells.getCell(rowPos, colPos).getValue()) {
                     case -1:
-                        Drawable s2 = getDrawable(R.drawable.smiley2);
-                        assert s2 != null;
-                        s2.setFilterBitmap(false);
-                        smiley.setImageDrawable(s2);
+                        smiley.setImageDrawable(smiley2Drawable);
                         timerHandler.removeCallbacks(timerRunnable);
                         for (int i = 0; i < rows; i++)
                             for (int j = 0; j < cols; j++)
-                                if (!flagged[i][j])
-                                    ib[i][j].setImageDrawable(images[cells[i][j] + 1]);
-                                else if (cells[i][j] != -1) {
-                                    Drawable fDraw = getDrawable(R.drawable.flag2);
-                                    assert fDraw != null;
-                                    fDraw.setFilterBitmap(false);
-                                    ib[i][j].setImageDrawable(fDraw);
-                                }
+                                if (!cells.getCell(i, j).isFlagged())
+                                    ib[i][j].setImageDrawable(images[cells.getCell(i, j).getValue() + 1]);
+                                else if (cells.getCell(i, j).getValue() != -1)
+                                    ib[i][j].setImageDrawable(flag2Drawable);
                         break;
                     case 0:
-                        ib[rowPos][colPos].setImageDrawable(images[cells[rowPos][colPos] + 1]);
-                        if (rowPos == 0 && colPos == 0) {
-                            revealCell(rowPos, colPos + 1);                 // Right
-                            revealCell(rowPos + 1, colPos);                // Bottom
-                            revealCell(rowPos + 1, colPos + 1);     // BottomRight
-                        } else if (rowPos == 0 && colPos == cols - 1) {
-                            revealCell(rowPos, colPos - 1);                 // Left
-                            revealCell(rowPos + 1, colPos - 1);     // BottomLeft
-                            revealCell(rowPos + 1, colPos);                // Bottom
-                        } else if (rowPos == rows - 1 && colPos == 0) {
-                            revealCell(rowPos - 1, colPos);                // Top
-                            revealCell(rowPos - 1, colPos + 1);     // TopRight
-                            revealCell(rowPos, colPos + 1);                 // Right
-                        } else if (rowPos == rows - 1 && colPos == cols - 1) {
-                            revealCell(rowPos - 1, colPos - 1);     // TopLeft
-                            revealCell(rowPos - 1, colPos);                // Top
-                            revealCell(rowPos, colPos - 1);                 // Left
-                        } else if (rowPos == 0 && colPos != cols - 1) {
-                            revealCell(rowPos, colPos - 1);                 // Left
-                            revealCell(rowPos, colPos + 1);                 // Right
-                            revealCell(rowPos + 1, colPos - 1);     // BottomLeft
-                            revealCell(rowPos + 1, colPos);                // Bottom
-                            revealCell(rowPos + 1, colPos + 1);     // BottomRight
-                        } else if (rowPos == rows - 1 && colPos != 0 && colPos != cols - 1) {
-                            revealCell(rowPos - 1, colPos - 1);     // TopLeft
-                            revealCell(rowPos - 1, colPos);                // Top
-                            revealCell(rowPos - 1, colPos + 1);     // TopRight
-                            revealCell(rowPos, colPos - 1);                 // Left
-                            revealCell(rowPos, colPos + 1);                 // Right
-                        } else if (colPos == 0 && rowPos != rows - 1) {
-                            revealCell(rowPos - 1, colPos);                // Top
-                            revealCell(rowPos - 1, colPos + 1);     // TopRight
-                            revealCell(rowPos, colPos + 1);                 // Right
-                            revealCell(rowPos + 1, colPos);                // Bottom
-                            revealCell(rowPos + 1, colPos + 1);     // BottomRight
-                        } else if (colPos == cols - 1 && rowPos != 0 && rowPos != rows - 1) {
-                            revealCell(rowPos - 1, colPos - 1);     // TopLeft
-                            revealCell(rowPos - 1, colPos);                // Top
-                            revealCell(rowPos, colPos - 1);                 // Left
-                            revealCell(rowPos + 1, colPos - 1);     // BottomLeft
-                            revealCell(rowPos + 1, colPos);                // Bottom
-                        } else {
-                            revealCell(rowPos - 1, colPos - 1);     // TopLeft
-                            revealCell(rowPos - 1, colPos);                // Top
-                            revealCell(rowPos - 1, colPos + 1);     // TopRight
-                            revealCell(rowPos, colPos - 1);                 // Left
-                            revealCell(rowPos, colPos + 1);                 // Right
-                            revealCell(rowPos + 1, colPos - 1);     // BottomLeft
-                            revealCell(rowPos + 1, colPos);                // Bottom
-                            revealCell(rowPos + 1, colPos + 1);     // BottomRight
-                        }
+                        ib[rowPos][colPos].setImageDrawable(images[cells.getCell(rowPos, colPos).getValue() + 1]);
+
+                        // TopLeft
+                        if (insideBounds(rowPos - 1, colPos - 1))
+                            revealCell(rowPos - 1, colPos - 1);
+
+                        // Top
+                        if (insideBounds(rowPos - 1, colPos))
+                            revealCell(rowPos - 1, colPos);
+
+                        // TopRight
+                        if (insideBounds(rowPos - 1, colPos + 1))
+                            revealCell(rowPos - 1, colPos + 1);
+
+                        // Left
+                        if (insideBounds(rowPos, colPos - 1))
+                            revealCell(rowPos, colPos - 1);
+
+                        // Right
+                        if (insideBounds(rowPos, colPos + 1))
+                            revealCell(rowPos, colPos + 1);
+
+                        // BottomLeft
+                        if (insideBounds(rowPos + 1, colPos - 1))
+                            revealCell(rowPos + 1, colPos - 1);
+
+                        // Bottom
+                        if (insideBounds(rowPos + 1, colPos))
+                            revealCell(rowPos + 1, colPos);
+
+                        // BottomRight
+                        if (insideBounds(rowPos + 1, colPos + 1))
+                            revealCell(rowPos + 1, colPos + 1);
+
                         break;
                     default:
-                        ib[rowPos][colPos].setImageDrawable(images[cells[rowPos][colPos] + 1]);
+                        ib[rowPos][colPos].setImageDrawable(images[cells.getCell(rowPos, colPos).getValue() + 1]);
                         break;
                 }
             }
@@ -501,14 +338,14 @@ public class MainActivity extends AppCompatActivity {
 
     public void flagSwitch (View view) {
         flag = !flag;
-        Drawable fDraw;
         if (flag)
-            fDraw = getDrawable(R.drawable.flag);
+            view.setBackground(flagDrawable);
         else
-            fDraw = getDrawable(R.drawable.bomb2);
-        assert fDraw != null;
-        fDraw.setFilterBitmap(false);
-        view.setBackground(fDraw);
+            view.setBackground(bombDrawable);
+    }
+
+    private boolean insideBounds (int r, int c) {
+        return !(r < 0 || c < 0 || r >= rows || c >= cols);
     }
 
 }
