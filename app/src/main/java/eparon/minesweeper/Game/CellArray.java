@@ -77,29 +77,31 @@ public class CellArray {
                 checkBottomLeft(i, this.cols - 1);
                 checkBottom(i, this.cols - 1);
             }
+        }
 
-            for (int j = 1; j < this.cols - 1; j++) {
+        for (int j = 1; j < this.cols - 1; j++) {
 
-                if (!borderRowsChecked) {
+            // Top
+            if (!this.cell[0][j].isBomb()) {
+                checkLeft(0, j);
+                checkRight(0, j);
+                checkBottomLeft(0, j);
+                checkBottom(0, j);
+                checkBottomRight(0, j);
+            }
 
-                    // Top
-                    if (!this.cell[0][j].isBomb()) {
-                        checkLeft(0, j);
-                        checkRight(0, j);
-                        checkBottomLeft(0, j);
-                        checkBottom(0, j);
-                        checkBottomRight(0, j);
-                    }
+            // Bottom
+            if (!this.cell[this.rows - 1][j].isBomb()) {
+                checkTopLeft(this.rows - 1, j);
+                checkTop(this.rows - 1, j);
+                checkTopRight(this.rows - 1, j);
+                checkLeft(this.rows - 1, j);
+                checkRight(this.rows - 1, j);
+            }
+        }
 
-                    // Bottom
-                    if (!this.cell[this.rows - 1][j].isBomb()) {
-                        checkTopLeft(this.rows - 1, j);
-                        checkTop(this.rows - 1, j);
-                        checkTopRight(this.rows - 1, j);
-                        checkLeft(this.rows - 1, j);
-                        checkRight(this.rows - 1, j);
-                    }
-                }
+        for (int i = 1; i < this.rows - 1; i++)
+            for (int j = 1; j < this.cols - 1; j++)
 
                 // Middle
                 if (!this.cell[i][j].isBomb()) {
@@ -112,11 +114,6 @@ public class CellArray {
                     checkBottom(i, j);
                     checkBottomRight(i, j);
                 }
-            }
-
-            borderRowsChecked = true;
-        }
-
     }
 
     private void checkTopLeft(int r, int c) {
