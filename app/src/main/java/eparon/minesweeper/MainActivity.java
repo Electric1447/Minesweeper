@@ -1,15 +1,19 @@
 package eparon.minesweeper;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Point;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
+import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.View.OnTouchListener;
+import android.view.View.*;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.GridLayout;
@@ -18,38 +22,39 @@ import android.widget.GridLayout.Spec;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.PopupWindow;
 import android.widget.TextView;
 
 import java.util.Locale;
 import java.util.Random;
 
-import eparon.minesweeper.Game.Cell;
 import eparon.minesweeper.Game.CellArray;
 
 @SuppressLint("ClickableViewAccessibility")
 public class MainActivity extends AppCompatActivity {
 
-    boolean firstTurn;
+    public String PREFS_OVH = "OVHPrefsFile";
+    SharedPreferences prefs;
+
+    int gameTurn;
     int firstCell;
 
     int rows = 18;
     int cols = 12;
-    CellArray cells = new CellArray(rows, cols);
-    int bombs = 60;
-    int flags = bombs;
+    CellArray cells;
+    int numberOfBombs;
+    int bombs, flags;
     boolean flag = false;
-    boolean borderRowsChecked = false;
 
     GridLayout gridLayout;
-    Spec row[] = new Spec[rows];
-    Spec col[] = new Spec[cols];
+    Spec[] row, col;
     int slotWidth, slotHeight;
 
-    FrameLayout fl[][] = new FrameLayout[rows][cols];
-    ImageButton ib[][] = new ImageButton[rows][cols];
+    FrameLayout[][] fl;
+    ImageButton[][] ib;
 
-    Drawable images[] = new Drawable[10];
-    int imagesResID[] = new int[] {R.drawable.bomb, R.drawable.cell_empty, R.drawable.cell_1,
+    Drawable[] images = new Drawable[10];
+    int[] imagesResID = new int[]{R.drawable.bomb, R.drawable.cell_empty, R.drawable.cell_1,
             R.drawable.cell_2, R.drawable.cell_3, R.drawable.cell_4, R.drawable.cell_5,
             R.drawable.cell_6, R.drawable.cell_7, R.drawable.cell_8};
 
@@ -79,10 +84,26 @@ public class MainActivity extends AppCompatActivity {
 
     Drawable cuaDrawable, flagDrawable, flag2Drawable, bombDrawable, smileyDrawable, smiley2Drawable, smiley3Drawable;
 
+    PopupWindow pw;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        prefs = getSharedPreferences(PREFS_OVH, Context.MODE_PRIVATE);
+
+        rows = prefs.getInt("rows", rows);
+        cols = prefs.getInt("cols", cols);
+
+        cells = new CellArray(rows, cols);
+        numberOfBombs = (int)((rows * cols) / 3.6); // Hard -> 3.6; Normal -> 4.5; Easy -> 6.0
+
+        row = new Spec[rows];
+        col = new Spec[cols];
+
+        fl = new FrameLayout[rows][cols];
+        ib = new ImageButton[rows][cols];
 
         TimerText[0] = findViewById(R.id.timer1);
         TimerText[1] = findViewById(R.id.timer2);
@@ -181,18 +202,19 @@ public class MainActivity extends AppCompatActivity {
 
     private void Init() {
 
-        firstTurn = true;
+        gameTurn = 0;
 
         timerHandler.removeCallbacks(timerRunnable);
         startTime = System.currentTimeMillis();
         timerHandler.postDelayed(timerRunnable, 0);
 
-        bombs = 60;
-        flags = bombs;
+        if (pw != null)
+            pw.dismiss();
+
+        bombs = numberOfBombs;
+        flags = numberOfBombs;
 
         BombsCounter.setText(String.format(Locale.getDefault(),"%02d", flags));
-
-        borderRowsChecked = false;
 
         for (int i = 0; i < rows; i++)
             for (int j = 0; j < cols; j++)
@@ -220,8 +242,7 @@ public class MainActivity extends AppCompatActivity {
                 ib[i][j].setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        if (firstTurn) {
-                            firstTurn = false;
+                        if (gameTurn == 0) {
                             firstCell = finalI * cols + finalJ;
                             startBoardGeneration();
                         }
@@ -283,6 +304,7 @@ public class MainActivity extends AppCompatActivity {
 
                 switch (cells.getCell(rowPos, colPos).getValue()) {
                     case -1:
+                        gameTurn = 0;
                         smiley.setImageDrawable(smiley2Drawable);
                         timerHandler.removeCallbacks(timerRunnable);
                         for (int i = 0; i < rows; i++)
@@ -296,35 +318,35 @@ public class MainActivity extends AppCompatActivity {
                         ib[rowPos][colPos].setImageDrawable(images[cells.getCell(rowPos, colPos).getValue() + 1]);
 
                         // TopLeft
-                        if (insideBounds(rowPos - 1, colPos - 1))
+                        if (inbounds(rowPos - 1, colPos - 1))
                             revealCell(rowPos - 1, colPos - 1);
 
                         // Top
-                        if (insideBounds(rowPos - 1, colPos))
+                        if (inbounds(rowPos - 1, colPos))
                             revealCell(rowPos - 1, colPos);
 
                         // TopRight
-                        if (insideBounds(rowPos - 1, colPos + 1))
+                        if (inbounds(rowPos - 1, colPos + 1))
                             revealCell(rowPos - 1, colPos + 1);
 
                         // Left
-                        if (insideBounds(rowPos, colPos - 1))
+                        if (inbounds(rowPos, colPos - 1))
                             revealCell(rowPos, colPos - 1);
 
                         // Right
-                        if (insideBounds(rowPos, colPos + 1))
+                        if (inbounds(rowPos, colPos + 1))
                             revealCell(rowPos, colPos + 1);
 
                         // BottomLeft
-                        if (insideBounds(rowPos + 1, colPos - 1))
+                        if (inbounds(rowPos + 1, colPos - 1))
                             revealCell(rowPos + 1, colPos - 1);
 
                         // Bottom
-                        if (insideBounds(rowPos + 1, colPos))
+                        if (inbounds(rowPos + 1, colPos))
                             revealCell(rowPos + 1, colPos);
 
                         // BottomRight
-                        if (insideBounds(rowPos + 1, colPos + 1))
+                        if (inbounds(rowPos + 1, colPos + 1))
                             revealCell(rowPos + 1, colPos + 1);
 
                         break;
@@ -332,8 +354,28 @@ public class MainActivity extends AppCompatActivity {
                         ib[rowPos][colPos].setImageDrawable(images[cells.getCell(rowPos, colPos).getValue() + 1]);
                         break;
                 }
+
+                gameTurn++;
+
+                if (gameTurn == rows * cols - numberOfBombs)
+                    winGame();
             }
         }
+    }
+
+    private void winGame () {
+
+        // Creating the custom Popup message
+        View customView = View.inflate(this, R.layout.popup_layout, null);
+
+        pw = new PopupWindow(customView, ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        pw.setElevation(5.0f);
+        pw.showAtLocation(findViewById(R.id.cl), Gravity.CENTER,0,0);
+
+        TextView Message = customView.findViewById(R.id.message);
+        Message.setText(String.format("%s\nTime: %s:%s", getResources().getString(R.string.win_msg), TimerText[0].getText().toString(), TimerText[1].getText().toString()));
+
+        timerHandler.removeCallbacks(timerRunnable);
     }
 
     public void flagSwitch (View view) {
@@ -344,7 +386,11 @@ public class MainActivity extends AppCompatActivity {
             view.setBackground(bombDrawable);
     }
 
-    private boolean insideBounds (int r, int c) {
+    public void goSettings (View view) {
+        startActivity(new Intent(MainActivity.this, Settings.class));
+    }
+
+    private boolean inbounds (int r, int c) {
         return !(r < 0 || c < 0 || r >= rows || c >= cols);
     }
 

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/cl"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".MainActivity"
@@ -67,6 +67,14 @@
                 android:layout_height="45dp"
                 android:layout_gravity="center_vertical|right"
                 android:layout_marginRight="12dp">
+
+                <ImageButton
+                    android:layout_width="45dp"
+                    android:layout_height="45dp"
+                    android:layout_gravity="center_vertical"
+                    android:background="@drawable/ic_settings_applications_dgrey_24dp"
+                    android:onClick="goSettings"
+                    android:scaleType="center" />
 
                 <ImageButton
                     android:id="@+id/switchPointer"

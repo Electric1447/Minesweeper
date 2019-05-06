@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Minesweeper</string>
+
+    <string name="win_msg">You Win!</string>
 </resources>
