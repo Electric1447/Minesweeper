@@ -2,4 +2,11 @@
     <string name="app_name">Minesweeper</string>
 
     <string name="win_msg">You Win!</string>
+
+    <string-array name="difficulty_array">
+        <item>Easy</item>
+        <item>Normal</item>
+        <item>Hard</item>
+        <item>EXTREME</item>
+    </string-array>
 </resources>

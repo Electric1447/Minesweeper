@@ -29,6 +29,7 @@ import java.util.Locale;
 import java.util.Random;
 
 import eparon.minesweeper.Game.CellArray;
+import eparon.minesweeper.Game.Difficulty;
 
 @SuppressLint("ClickableViewAccessibility")
 public class MainActivity extends AppCompatActivity {
@@ -45,6 +46,7 @@ public class MainActivity extends AppCompatActivity {
     int numberOfBombs;
     int bombs, flags;
     boolean flag = false;
+    double difficulty = Difficulty.HARD;
 
     GridLayout gridLayout;
     Spec[] row, col;
@@ -95,9 +97,10 @@ public class MainActivity extends AppCompatActivity {
 
         rows = prefs.getInt("rows", rows);
         cols = prefs.getInt("cols", cols);
+        difficulty = Double.parseDouble(prefs.getString("difficulty", String.valueOf(difficulty)));
 
         cells = new CellArray(rows, cols);
-        numberOfBombs = (int)((rows * cols) / 3.6); // Hard -> 3.6; Normal -> 4.5; Easy -> 6.0
+        numberOfBombs = (int)((rows * cols) / difficulty);
 
         row = new Spec[rows];
         col = new Spec[cols];
@@ -105,52 +108,36 @@ public class MainActivity extends AppCompatActivity {
         fl = new FrameLayout[rows][cols];
         ib = new ImageButton[rows][cols];
 
+        Drawable timerDrawable = initializeDrawable(R.drawable.timer_background);
+        Drawable bcDrawable = initializeDrawable(R.drawable.bombs_counter_background);
+
+        cuaDrawable = initializeDrawable(R.drawable.cell_unassigned);
+        flagDrawable = initializeDrawable(R.drawable.flag);
+        flag2Drawable = initializeDrawable(R.drawable.flag2);
+        bombDrawable = initializeDrawable(R.drawable.bomb2);
+        smileyDrawable = initializeDrawable(R.drawable.smiley);
+        smiley2Drawable = initializeDrawable(R.drawable.smiley2);
+        smiley3Drawable = initializeDrawable(R.drawable.smiley3);
+
+        for (int i = 0; i < images.length; i++)
+            images[i] = initializeDrawable(imagesResID[i]);
+
         TimerText[0] = findViewById(R.id.timer1);
         TimerText[1] = findViewById(R.id.timer2);
         BombsCounter = findViewById(R.id.bombsCounter);
+
         Typeface digital7_mono = Typeface.createFromAsset(getAssets(), "fonts/digital-7_mono.ttf");
+
         TimerText[0].setTypeface(digital7_mono);
         TimerText[1].setTypeface(digital7_mono);
         BombsCounter.setTypeface(digital7_mono);
+
         LinearLayout TimerLL = findViewById(R.id.timerll);
-        Drawable timerDrawable = getDrawable(R.drawable.timer_background);
-        Drawable bcDrawable = getDrawable(R.drawable.bombs_counter_background);
-        assert timerDrawable != null;
-        assert bcDrawable != null;
-        timerDrawable.setFilterBitmap(false);
-        bcDrawable.setFilterBitmap(false);
         TimerLL.setBackground(timerDrawable);
         BombsCounter.setBackground(bcDrawable);
 
         ImageView flagIV = findViewById(R.id.switchPointer);
-        cuaDrawable = getDrawable(R.drawable.cell_unassigned);
-        assert cuaDrawable != null;
-        cuaDrawable.setFilterBitmap(false);
-        flagDrawable = getDrawable(R.drawable.flag);
-        assert flagDrawable != null;
-        flagDrawable.setFilterBitmap(false);
-        flag2Drawable = getDrawable(R.drawable.flag2);
-        assert flag2Drawable != null;
-        flag2Drawable.setFilterBitmap(false);
-        bombDrawable = getDrawable(R.drawable.bomb2);
-        assert bombDrawable != null;
-        bombDrawable.setFilterBitmap(false);
-        smileyDrawable = getDrawable(R.drawable.smiley);
-        assert smileyDrawable != null;
-        smileyDrawable.setFilterBitmap(false);
-        smiley2Drawable = getDrawable(R.drawable.smiley2);
-        assert smiley2Drawable != null;
-        smiley2Drawable.setFilterBitmap(false);
-        smiley3Drawable = getDrawable(R.drawable.smiley3);
-        assert smiley3Drawable != null;
-        smiley3Drawable.setFilterBitmap(false);
         flagIV.setBackground(bombDrawable);
-
-        for (int i = 0; i < images.length; i++) {
-            images[i] = getDrawable(imagesResID[i]);
-            assert images[i] != null;
-            images[i].setFilterBitmap(false);
-        }
 
         smiley = findViewById(R.id.smiley);
         smiley.setImageDrawable(smileyDrawable);
@@ -392,6 +379,13 @@ public class MainActivity extends AppCompatActivity {
 
     private boolean inbounds (int r, int c) {
         return !(r < 0 || c < 0 || r >= rows || c >= cols);
+    }
+
+    private Drawable initializeDrawable (int resID) {
+        Drawable d = getDrawable(resID);
+        assert d != null;
+        d.setFilterBitmap(false);
+        return d;
     }
 
 }

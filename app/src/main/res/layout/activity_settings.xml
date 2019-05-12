@@ -62,7 +62,7 @@
                 android:layout_height="match_parent"
                 android:gravity="center"
                 android:paddingRight="7dp"
-                android:text="Number of Cols (Min: 6):"
+                android:text="Number of Cols (Min: 6): "
                 android:textColor="#000"
                 android:textSize="18sp" />
 
@@ -75,6 +75,30 @@
                 android:inputType="number"
                 android:maxLength="2"
                 android:textSize="20sp" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingBottom="12dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:paddingRight="7dp"
+                android:text="Difficulty:"
+                android:textColor="#000"
+                android:textSize="18sp" />
+
+            <Spinner
+                android:id="@+id/dif_spinner"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:entries="@array/difficulty_array"
+                android:gravity="center" />
 
         </LinearLayout>
 

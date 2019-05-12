@@ -58,7 +58,6 @@
                 android:layout_width="45dp"
                 android:layout_height="45dp"
                 android:layout_gravity="center"
-                android:layout_marginRight="12dp"
                 android:background="@drawable/smiley"
                 android:scaleType="center" />
 
@@ -69,11 +68,12 @@
                 android:layout_marginRight="12dp">
 
                 <ImageButton
-                    android:layout_width="45dp"
-                    android:layout_height="45dp"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
                     android:layout_gravity="center_vertical"
                     android:background="@drawable/ic_settings_applications_dgrey_24dp"
                     android:onClick="goSettings"
+                    android:layout_marginRight="5dp"
                     android:scaleType="center" />
 
                 <ImageButton

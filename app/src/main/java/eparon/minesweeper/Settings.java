@@ -6,17 +6,27 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import eparon.minesweeper.Game.Difficulty;
+
 @SuppressLint("SetTextI18n")
-public class Settings extends AppCompatActivity {
+public class Settings extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
     public String PREFS_OVH = "OVHPrefsFile";
     SharedPreferences prefs;
 
     int rows = 18, cols = 12;
     TextView Rows, Cols;
+
+    double difficulty = Difficulty.HARD;
+    double[] difArr = new double[]{Difficulty.EASY, Difficulty.NORMAL, Difficulty.HARD, Difficulty.EXTREME};
+    Spinner difSpinner;
 
     @Override
     public void onBackPressed() {
@@ -35,6 +45,7 @@ public class Settings extends AppCompatActivity {
                 SharedPreferences.Editor editor = prefs.edit();
                 editor.putInt("rows", rows);
                 editor.putInt("cols", cols);
+                editor.putString("difficulty", String.valueOf(difficulty));
                 editor.apply();
                 startActivity(new Intent(Settings.this, MainActivity.class));
             }
@@ -51,12 +62,28 @@ public class Settings extends AppCompatActivity {
 
         rows = prefs.getInt("rows", rows);
         cols = prefs.getInt("cols", cols);
+        difficulty = Double.parseDouble(prefs.getString("difficulty", String.valueOf(difficulty)));
 
         Rows = findViewById(R.id.rText);
         Cols = findViewById(R.id.cText);
 
+        difSpinner = findViewById(R.id.dif_spinner);
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this, R.array.difficulty_array, android.R.layout.simple_spinner_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        difSpinner.setAdapter(adapter);
+        difSpinner.setOnItemSelectedListener(this);
+        difSpinner.setSelection((int)(6 - difficulty));
+
         TextView version = findViewById(R.id.ver);
         version.setText(String.format("Version %s", BuildConfig.VERSION_NAME));
     }
+
+    @Override
+    public void onItemSelected(AdapterView<?> adapterView, View view, int position, long l) {
+        difficulty = difArr[position];
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> adapterView) { }
 
 }
