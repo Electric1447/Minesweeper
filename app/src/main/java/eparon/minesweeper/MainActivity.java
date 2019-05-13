@@ -51,7 +51,7 @@ public class MainActivity extends AppCompatActivity {
     int bombs, flags;
     boolean flag = false;
     double difficulty = Difficulty.HARD;
-    boolean vibration = true;
+    boolean longpress = true, vibration = true;
 
     GridLayout gridLayout;
     Spec[] row, col;
@@ -94,9 +94,7 @@ public class MainActivity extends AppCompatActivity {
     PopupWindow pw;
 
     @Override
-    public void onBackPressed() {
-        finishAndRemoveTask();
-    }
+    public void onBackPressed() { }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -108,6 +106,7 @@ public class MainActivity extends AppCompatActivity {
         rows = prefs.getInt("rows", rows);
         cols = prefs.getInt("cols", cols);
         difficulty = Double.parseDouble(prefs.getString("difficulty", String.valueOf(difficulty)));
+        longpress = prefs.getBoolean("longpress", longpress);
         vibration = prefs.getBoolean("vibration", vibration);
 
         cells = new Board(rows, cols);
@@ -242,18 +241,20 @@ public class MainActivity extends AppCompatActivity {
                         clickCell(finalI, finalJ, flag);
                     }
                 });
-                ib[i][j].setOnLongClickListener(new OnLongClickListener() {
-                    @Override
-                    public boolean onLongClick(View v) {
-                        clickCell(finalI, finalJ, !flag);
-                        if (vibration)
-                            if (Build.VERSION.SDK_INT >= 26)
-                                ((Vibrator) Objects.requireNonNull(getSystemService(VIBRATOR_SERVICE))).vibrate(VibrationEffect.createOneShot(100, VibrationEffect.DEFAULT_AMPLITUDE));
-                            else
-                                ((Vibrator) Objects.requireNonNull(getSystemService(VIBRATOR_SERVICE))).vibrate(100);
-                        return true;
-                    }
-                });
+                if (longpress) {
+                    ib[i][j].setOnLongClickListener(new OnLongClickListener() {
+                        @Override
+                        public boolean onLongClick(View v) {
+                            clickCell(finalI, finalJ, !flag);
+                            if (vibration)
+                                if (Build.VERSION.SDK_INT >= 26)
+                                    ((Vibrator) Objects.requireNonNull(getSystemService(VIBRATOR_SERVICE))).vibrate(VibrationEffect.createOneShot(100, VibrationEffect.DEFAULT_AMPLITUDE));
+                                else
+                                    ((Vibrator) Objects.requireNonNull(getSystemService(VIBRATOR_SERVICE))).vibrate(100);
+                            return true;
+                        }
+                    });
+                }
             }
         }
 

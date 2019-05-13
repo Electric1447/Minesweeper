@@ -28,7 +28,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:paddingBottom="12dp">
+            android:paddingBottom="2dp">
 
             <TextView
                 android:layout_width="240dp"
@@ -55,7 +55,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:paddingBottom="12dp">
+            android:paddingBottom="14dp">
 
             <TextView
                 android:layout_width="240dp"
@@ -106,13 +106,13 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:paddingBottom="24dp">
+            android:paddingBottom="20dp">
 
             <TextView
-                android:layout_width="wrap_content"
+                android:layout_width="120dp"
                 android:layout_height="match_parent"
-                android:gravity="center"
-                android:paddingRight="24dp"
+                android:gravity="center_vertical"
+                android:paddingRight="16dp"
                 android:text="Vibration:"
                 android:textColor="#000"
                 android:textSize="18sp" />
@@ -123,6 +123,30 @@
                 android:layout_height="match_parent"
                 android:gravity="center"
                 android:onClick="setVibration" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingBottom="20dp">
+
+            <TextView
+                android:layout_width="120dp"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical"
+                android:paddingRight="16dp"
+                android:text="Longpress:"
+                android:textColor="#000"
+                android:textSize="18sp" />
+
+            <CheckBox
+                android:id="@+id/cbLongpress"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:onClick="setLongpress" />
 
         </LinearLayout>
 

@@ -53,14 +53,6 @@
 
             </LinearLayout>
 
-            <ImageButton
-                android:id="@+id/smiley"
-                android:layout_width="45dp"
-                android:layout_height="45dp"
-                android:layout_gravity="center"
-                android:background="@drawable/smiley"
-                android:scaleType="center" />
-
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="45dp"
@@ -68,8 +60,8 @@
                 android:layout_marginRight="12dp">
 
                 <ImageButton
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
                     android:layout_gravity="center_vertical"
                     android:background="@drawable/ic_settings_applications_dgrey_24dp"
                     android:onClick="goSettings"
@@ -98,6 +90,14 @@
                     android:textSize="48sp" />
 
             </LinearLayout>
+
+            <ImageButton
+                android:id="@+id/smiley"
+                android:layout_width="45dp"
+                android:layout_height="45dp"
+                android:layout_gravity="center"
+                android:background="@drawable/smiley"
+                android:scaleType="center" />
 
         </android.support.design.widget.CoordinatorLayout>
 

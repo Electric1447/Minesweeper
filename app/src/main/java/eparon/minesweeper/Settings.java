@@ -29,8 +29,8 @@ public class Settings extends AppCompatActivity implements AdapterView.OnItemSel
     double[] difArr = new double[]{Difficulty.EASY, Difficulty.NORMAL, Difficulty.HARD, Difficulty.EXTREME};
     Spinner difSpinner;
 
-    boolean vibration = true;
-    CheckBox vibrationCB;
+    boolean longpress = true, vibration = true;
+    CheckBox longpressCB, vibrationCB;
 
     @Override
     public void onBackPressed() {
@@ -50,6 +50,7 @@ public class Settings extends AppCompatActivity implements AdapterView.OnItemSel
                 editor.putInt("rows", rows);
                 editor.putInt("cols", cols);
                 editor.putString("difficulty", String.valueOf(difficulty));
+                editor.putBoolean("longpress", longpress);
                 editor.putBoolean("vibration", vibration);
                 editor.apply();
                 startActivity(new Intent(Settings.this, MainActivity.class));
@@ -68,6 +69,7 @@ public class Settings extends AppCompatActivity implements AdapterView.OnItemSel
         rows = prefs.getInt("rows", rows);
         cols = prefs.getInt("cols", cols);
         difficulty = Double.parseDouble(prefs.getString("difficulty", String.valueOf(difficulty)));
+        longpress = prefs.getBoolean("longpress", longpress);
         vibration = prefs.getBoolean("vibration", vibration);
 
         Rows = findViewById(R.id.rText);
@@ -80,6 +82,8 @@ public class Settings extends AppCompatActivity implements AdapterView.OnItemSel
         difSpinner.setOnItemSelectedListener(this);
         difSpinner.setSelection((int)(6 - difficulty));
 
+        longpressCB = findViewById(R.id.cbLongpress);
+        longpressCB.setChecked(longpress);
         vibrationCB = findViewById(R.id.cbVibration);
         vibrationCB.setChecked(vibration);
 
@@ -94,6 +98,10 @@ public class Settings extends AppCompatActivity implements AdapterView.OnItemSel
 
     @Override
     public void onNothingSelected(AdapterView<?> adapterView) { }
+
+    public void setLongpress (View view) {
+        longpress = longpressCB.isChecked();
+    }
 
     public void setVibration (View view) {
         vibration = vibrationCB.isChecked();
