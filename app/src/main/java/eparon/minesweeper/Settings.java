@@ -9,6 +9,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.CheckBox;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -28,6 +29,9 @@ public class Settings extends AppCompatActivity implements AdapterView.OnItemSel
     double[] difArr = new double[]{Difficulty.EASY, Difficulty.NORMAL, Difficulty.HARD, Difficulty.EXTREME};
     Spinner difSpinner;
 
+    boolean vibration = true;
+    CheckBox vibrationCB;
+
     @Override
     public void onBackPressed() {
         if (Rows.getText().toString().equals("")) Rows.setText(String.valueOf(rows));
@@ -46,6 +50,7 @@ public class Settings extends AppCompatActivity implements AdapterView.OnItemSel
                 editor.putInt("rows", rows);
                 editor.putInt("cols", cols);
                 editor.putString("difficulty", String.valueOf(difficulty));
+                editor.putBoolean("vibration", vibration);
                 editor.apply();
                 startActivity(new Intent(Settings.this, MainActivity.class));
             }
@@ -63,6 +68,7 @@ public class Settings extends AppCompatActivity implements AdapterView.OnItemSel
         rows = prefs.getInt("rows", rows);
         cols = prefs.getInt("cols", cols);
         difficulty = Double.parseDouble(prefs.getString("difficulty", String.valueOf(difficulty)));
+        vibration = prefs.getBoolean("vibration", vibration);
 
         Rows = findViewById(R.id.rText);
         Cols = findViewById(R.id.cText);
@@ -73,6 +79,9 @@ public class Settings extends AppCompatActivity implements AdapterView.OnItemSel
         difSpinner.setAdapter(adapter);
         difSpinner.setOnItemSelectedListener(this);
         difSpinner.setSelection((int)(6 - difficulty));
+
+        vibrationCB = findViewById(R.id.cbVibration);
+        vibrationCB.setChecked(vibration);
 
         TextView version = findViewById(R.id.ver);
         version.setText(String.format("Version %s", BuildConfig.VERSION_NAME));
@@ -85,5 +94,9 @@ public class Settings extends AppCompatActivity implements AdapterView.OnItemSel
 
     @Override
     public void onNothingSelected(AdapterView<?> adapterView) { }
+
+    public void setVibration (View view) {
+        vibration = vibrationCB.isChecked();
+    }
 
 }

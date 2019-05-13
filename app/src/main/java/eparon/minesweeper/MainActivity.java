@@ -7,8 +7,11 @@ import android.content.SharedPreferences;
 import android.graphics.Point;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.VibrationEffect;
+import android.os.Vibrator;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Gravity;
 import android.view.MotionEvent;
@@ -26,9 +29,10 @@ import android.widget.PopupWindow;
 import android.widget.TextView;
 
 import java.util.Locale;
+import java.util.Objects;
 import java.util.Random;
 
-import eparon.minesweeper.Game.CellArray;
+import eparon.minesweeper.Game.Board;
 import eparon.minesweeper.Game.Difficulty;
 
 @SuppressLint("ClickableViewAccessibility")
@@ -42,11 +46,12 @@ public class MainActivity extends AppCompatActivity {
 
     int rows = 18;
     int cols = 12;
-    CellArray cells;
+    Board cells;
     int numberOfBombs;
     int bombs, flags;
     boolean flag = false;
     double difficulty = Difficulty.HARD;
+    boolean vibration = true;
 
     GridLayout gridLayout;
     Spec[] row, col;
@@ -89,6 +94,11 @@ public class MainActivity extends AppCompatActivity {
     PopupWindow pw;
 
     @Override
+    public void onBackPressed() {
+        finishAndRemoveTask();
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
@@ -98,8 +108,9 @@ public class MainActivity extends AppCompatActivity {
         rows = prefs.getInt("rows", rows);
         cols = prefs.getInt("cols", cols);
         difficulty = Double.parseDouble(prefs.getString("difficulty", String.valueOf(difficulty)));
+        vibration = prefs.getBoolean("vibration", vibration);
 
-        cells = new CellArray(rows, cols);
+        cells = new Board(rows, cols);
         numberOfBombs = (int)((rows * cols) / difficulty);
 
         row = new Spec[rows];
@@ -143,8 +154,8 @@ public class MainActivity extends AppCompatActivity {
         smiley.setImageDrawable(smileyDrawable);
         smiley.setOnTouchListener(new OnTouchListener() {
             @Override
-            public boolean onTouch(View arg0, MotionEvent arg1) {
-                switch (arg1.getAction()) {
+            public boolean onTouch(View v, MotionEvent event) {
+                switch (event.getAction()) {
                     case MotionEvent.ACTION_DOWN:
                         smiley.setImageDrawable(smiley3Drawable);
                         break;
@@ -195,8 +206,7 @@ public class MainActivity extends AppCompatActivity {
         startTime = System.currentTimeMillis();
         timerHandler.postDelayed(timerRunnable, 0);
 
-        if (pw != null)
-            pw.dismiss();
+        if (pw != null) pw.dismiss();
 
         bombs = numberOfBombs;
         flags = numberOfBombs;
@@ -229,14 +239,21 @@ public class MainActivity extends AppCompatActivity {
                 ib[i][j].setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        if (gameTurn == 0) {
-                            firstCell = finalI * cols + finalJ;
-                            startBoardGeneration();
-                        }
-                        revealCell(finalI, finalJ);
+                        clickCell(finalI, finalJ, flag);
                     }
                 });
-
+                ib[i][j].setOnLongClickListener(new OnLongClickListener() {
+                    @Override
+                    public boolean onLongClick(View v) {
+                        clickCell(finalI, finalJ, !flag);
+                        if (vibration)
+                            if (Build.VERSION.SDK_INT >= 26)
+                                ((Vibrator) Objects.requireNonNull(getSystemService(VIBRATOR_SERVICE))).vibrate(VibrationEffect.createOneShot(100, VibrationEffect.DEFAULT_AMPLITUDE));
+                            else
+                                ((Vibrator) Objects.requireNonNull(getSystemService(VIBRATOR_SERVICE))).vibrate(100);
+                        return true;
+                    }
+                });
             }
         }
 
@@ -265,14 +282,14 @@ public class MainActivity extends AppCompatActivity {
             counter++;
         }
 
-        cells.bombDetector();
+        cells.detectBombs();
     }
 
-    private void revealCell(int rowPos, int colPos) {
+    private void revealCell(int rowPos, int colPos, boolean putFlag) {
 
         // If it hasn't been clicked yet.
         if (!cells.getCell(rowPos, colPos).isClicked()) {
-            if (flag) {
+            if (putFlag) {
                 if (!cells.getCell(rowPos, colPos).isFlagged()) {
                     if (flags > 0) {
                         ib[rowPos][colPos].setImageDrawable(flagDrawable);
@@ -300,41 +317,19 @@ public class MainActivity extends AppCompatActivity {
                                     ib[i][j].setImageDrawable(images[cells.getCell(i, j).getValue() + 1]);
                                 else if (cells.getCell(i, j).getValue() != -1)
                                     ib[i][j].setImageDrawable(flag2Drawable);
+                        cells.Disable();
                         break;
                     case 0:
                         ib[rowPos][colPos].setImageDrawable(images[cells.getCell(rowPos, colPos).getValue() + 1]);
 
-                        // TopLeft
-                        if (inbounds(rowPos - 1, colPos - 1))
-                            revealCell(rowPos - 1, colPos - 1);
-
-                        // Top
-                        if (inbounds(rowPos - 1, colPos))
-                            revealCell(rowPos - 1, colPos);
-
-                        // TopRight
-                        if (inbounds(rowPos - 1, colPos + 1))
-                            revealCell(rowPos - 1, colPos + 1);
-
-                        // Left
-                        if (inbounds(rowPos, colPos - 1))
-                            revealCell(rowPos, colPos - 1);
-
-                        // Right
-                        if (inbounds(rowPos, colPos + 1))
-                            revealCell(rowPos, colPos + 1);
-
-                        // BottomLeft
-                        if (inbounds(rowPos + 1, colPos - 1))
-                            revealCell(rowPos + 1, colPos - 1);
-
-                        // Bottom
-                        if (inbounds(rowPos + 1, colPos))
-                            revealCell(rowPos + 1, colPos);
-
-                        // BottomRight
-                        if (inbounds(rowPos + 1, colPos + 1))
-                            revealCell(rowPos + 1, colPos + 1);
+                        revealNearbyCell(rowPos - 1, colPos - 1);    // Top Left
+                        revealNearbyCell(rowPos - 1, colPos    );    // Top
+                        revealNearbyCell(rowPos - 1, colPos + 1);    // Top Right
+                        revealNearbyCell(rowPos    , colPos - 1);    // Left
+                        revealNearbyCell(rowPos    , colPos + 1);    // Right
+                        revealNearbyCell(rowPos + 1, colPos - 1);    // Bottom Left
+                        revealNearbyCell(rowPos + 1, colPos    );    // Bottom
+                        revealNearbyCell(rowPos + 1, colPos + 1);    // Bottom Right
 
                         break;
                     default:
@@ -352,6 +347,8 @@ public class MainActivity extends AppCompatActivity {
 
     private void winGame () {
 
+        cells.Disable();
+
         // Creating the custom Popup message
         View customView = View.inflate(this, R.layout.popup_layout, null);
 
@@ -365,6 +362,26 @@ public class MainActivity extends AppCompatActivity {
         timerHandler.removeCallbacks(timerRunnable);
     }
 
+    private void clickCell (final int r, final int c, boolean clickType) {
+        if (gameTurn == 0 && !clickType) {
+            firstCell = r * cols + c;
+            startBoardGeneration();
+        }
+        revealCell(r, c, clickType);
+    }
+
+    private void revealNearbyCell (final int r, final int c) {
+        if (!(r < 0 || c < 0 || r >= rows || c >= cols))
+            revealCell(r, c, false);
+    }
+
+    private Drawable initializeDrawable (int resID) {
+        Drawable d = getDrawable(resID);
+        assert d != null;
+        d.setFilterBitmap(false);
+        return d;
+    }
+
     public void flagSwitch (View view) {
         flag = !flag;
         if (flag)
@@ -375,17 +392,6 @@ public class MainActivity extends AppCompatActivity {
 
     public void goSettings (View view) {
         startActivity(new Intent(MainActivity.this, Settings.class));
-    }
-
-    private boolean inbounds (int r, int c) {
-        return !(r < 0 || c < 0 || r >= rows || c >= cols);
-    }
-
-    private Drawable initializeDrawable (int resID) {
-        Drawable d = getDrawable(resID);
-        assert d != null;
-        d.setFilterBitmap(false);
-        return d;
     }
 
 }

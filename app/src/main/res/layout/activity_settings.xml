@@ -31,9 +31,9 @@
             android:paddingBottom="12dp">
 
             <TextView
-                android:layout_width="wrap_content"
+                android:layout_width="240dp"
                 android:layout_height="match_parent"
-                android:gravity="center"
+                android:gravity="center_vertical"
                 android:paddingRight="7dp"
                 android:text="Number of Rows (Min: 9):"
                 android:textColor="#000"
@@ -58,11 +58,11 @@
             android:paddingBottom="12dp">
 
             <TextView
-                android:layout_width="wrap_content"
+                android:layout_width="240dp"
                 android:layout_height="match_parent"
-                android:gravity="center"
+                android:gravity="center_vertical"
                 android:paddingRight="7dp"
-                android:text="Number of Cols (Min: 6): "
+                android:text="Number of Cols (Min: 6):"
                 android:textColor="#000"
                 android:textSize="18sp" />
 
@@ -82,7 +82,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:paddingBottom="12dp">
+            android:paddingBottom="24dp">
 
             <TextView
                 android:layout_width="wrap_content"
@@ -99,6 +99,30 @@
                 android:layout_height="wrap_content"
                 android:entries="@array/difficulty_array"
                 android:gravity="center" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingBottom="24dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:paddingRight="24dp"
+                android:text="Vibration:"
+                android:textColor="#000"
+                android:textSize="18sp" />
+
+            <CheckBox
+                android:id="@+id/cbVibration"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:onClick="setVibration" />
 
         </LinearLayout>
 
