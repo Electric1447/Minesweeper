@@ -47,9 +47,32 @@ public class Board {
                 }
     }
 
+    public int countSurroundingFlags (final int r, final int c) {
+        int count = 0;
+        if (this.isFlagAt(r - 1, c - 1)) count++; // Top Left
+        if (this.isFlagAt(r - 1, c    )) count++; // Top
+        if (this.isFlagAt(r - 1, c + 1)) count++; // Top Right
+        if (this.isFlagAt(r    , c - 1)) count++; // Left
+        if (this.isFlagAt(r    , c + 1)) count++; // Right
+        if (this.isFlagAt(r + 1, c - 1)) count++; // Bottom Left
+        if (this.isFlagAt(r + 1, c    )) count++; // Bottom
+        if (this.isFlagAt(r + 1, c + 1)) count++; // Bottom Right
+        return count;
+    }
+
+    public boolean inbounds (final int r, final int c) {
+        return !(r < 0 || c < 0 || r >= this.rows || c >= this.cols);
+    }
+
     private boolean isMineAt (final int r, final int c) {
-        if (!(r < 0 || c < 0 || r >= this.rows || c >= this.cols))
+        if (this.inbounds(r, c))
             return this.cell[r][c].isBomb();
+        return false;
+    }
+
+    private boolean isFlagAt (final int r, final int c) {
+        if (this.inbounds(r, c))
+            return this.cell[r][c].isFlagged();
         return false;
     }
 
