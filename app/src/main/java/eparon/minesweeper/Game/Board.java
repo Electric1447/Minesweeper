@@ -18,12 +18,14 @@ public class Board {
                 this.cell[i][j] = new Cell();
     }
 
-    public Cell[][] getBoard() {
-        return this.cell;
-    }
-
     public Cell getCell(int r, int c) {
         return this.cell[r][c];
+    }
+
+    public void resetState () {
+        for (int i = 0; i < this.rows; i++)
+            for (int j = 0; j < this.cols; j++)
+                this.cell[i][j].resetState();
     }
 
     public void Disable () {

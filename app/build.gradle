@@ -6,8 +6,8 @@ android {
         applicationId "eparon.minesweeper"
         minSdkVersion 21
         targetSdkVersion 28
-        versionCode 240
-        versionName "2.4.0"
+        versionCode 241
+        versionName "2.4.1"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {

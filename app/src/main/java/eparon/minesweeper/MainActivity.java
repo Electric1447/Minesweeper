@@ -199,9 +199,7 @@ public class MainActivity extends AppCompatActivity {
 
         BombsCounter.setText(String.format(Locale.getDefault(),"%02d", flags));
 
-        for (int i = 0; i < rows; i++)
-            for (int j = 0; j < cols; j++)
-                board.getCell(i, j).resetState();
+        board.resetState();
 
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < cols; j++) {
@@ -232,12 +230,12 @@ public class MainActivity extends AppCompatActivity {
                     ib[i][j].setOnLongClickListener(new OnLongClickListener() {
                         @Override
                         public boolean onLongClick(View v) {
-                            clickCell(finalI, finalJ, !flag);
-                            if (vibration)
+                            if (vibration && !board.getCell(finalI, finalJ).isClicked())
                                 if (Build.VERSION.SDK_INT >= 26)
                                     ((Vibrator) Objects.requireNonNull(getSystemService(VIBRATOR_SERVICE))).vibrate(VibrationEffect.createOneShot(100, VibrationEffect.DEFAULT_AMPLITUDE));
                                 else
                                     ((Vibrator) Objects.requireNonNull(getSystemService(VIBRATOR_SERVICE))).vibrate(100);
+                            clickCell(finalI, finalJ, !flag);
                             return true;
                         }
                     });
@@ -273,6 +271,7 @@ public class MainActivity extends AppCompatActivity {
         board.detectBombs();
     }
 
+
     private void revealCell(int rowPos, int colPos, boolean putFlag) {
 
         // If it hasn't been clicked yet.
@@ -282,8 +281,9 @@ public class MainActivity extends AppCompatActivity {
                     if (flags > 0) {
                         ib[rowPos][colPos].setImageDrawable(flagDrawable);
                         flags--;
-                    } else
+                    } else {
                         board.getCell(rowPos, colPos).setFlagged(!board.getCell(rowPos, colPos).isFlagged());
+                    }
                 } else {
                     ib[rowPos][colPos].setImageDrawable(cuaDrawable);
                     flags++;
