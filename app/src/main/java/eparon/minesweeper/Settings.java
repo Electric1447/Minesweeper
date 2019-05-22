@@ -100,10 +100,12 @@ public class Settings extends AppCompatActivity implements AdapterView.OnItemSel
     public void onNothingSelected(AdapterView<?> adapterView) { }
 
     public void setLongpress (View view) {
+        longpressCB.setChecked(!longpressCB.isChecked());
         longpress = longpressCB.isChecked();
     }
 
     public void setVibration (View view) {
+        vibrationCB.setChecked(!vibrationCB.isChecked());
         vibration = vibrationCB.isChecked();
     }
 

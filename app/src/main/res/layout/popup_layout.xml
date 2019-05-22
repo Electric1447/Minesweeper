@@ -3,7 +3,7 @@
     android:id="@+id/rl_custom_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/popupanswer"
+    android:background="@drawable/rounded_corners"
     android:padding="2dp">
 
     <TextView

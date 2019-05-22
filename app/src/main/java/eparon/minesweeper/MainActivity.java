@@ -26,6 +26,7 @@ import android.widget.ImageView;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 
+import java.io.File;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Random;
@@ -185,6 +186,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void Init() {
+
+        deleteCache(this);
 
         gameTurn = 0;
 
@@ -386,6 +389,27 @@ public class MainActivity extends AppCompatActivity {
 
     public void goSettings (View view) {
         startActivity(new Intent(MainActivity.this, Settings.class));
+    }
+
+    public static void deleteCache(Context context) {
+        try {
+            File dir = context.getCacheDir();
+            deleteDir(dir);
+        } catch (Exception e) { e.printStackTrace(); }
+    }
+
+    public static boolean deleteDir(File dir) {
+        if (dir != null && dir.isDirectory()) {
+            String[] children = dir.list();
+            for (String child : children)
+                if (!deleteDir(new File(dir, child)))
+                    return false;
+            return dir.delete();
+        } else if (dir!= null && dir.isFile()) {
+            return dir.delete();
+        } else {
+            return false;
+        }
     }
 
 }

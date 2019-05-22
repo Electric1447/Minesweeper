@@ -5,150 +5,179 @@
     android:layout_height="match_parent"
     android:background="@color/colorPrimaryDark"
     tools:context="eparon.minesweeper.Settings"
-    tools:ignore="Autofill,HardcodedText,RtlHardcoded,RtlSymmetry">
+    tools:ignore="Autofill,HardcodedText,RtlHardcoded,RtlSymmetry,RelativeOverlap">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        android:padding="10dp">
+        android:padding="12dp">
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="36dp"
+            android:background="@drawable/rounded_corners"
+            android:backgroundTint="@color/colorPrimary"
             android:fontFamily="sans-serif-condensed-medium"
             android:gravity="center"
-            android:paddingTop="10dp"
-            android:paddingBottom="24dp"
+            android:paddingTop="12dp"
+            android:paddingBottom="16dp"
             android:text="Settings"
             android:textColor="#000"
             android:textSize="48sp" />
 
-        <LinearLayout
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:paddingBottom="2dp">
+            android:layout_height="56dp"
+            android:layout_marginBottom="16dp"
+            android:background="@drawable/rounded_corners"
+            android:backgroundTint="@color/colorPrimary"
+            android:paddingLeft="20dp"
+            android:paddingRight="20dp">
 
             <TextView
-                android:layout_width="240dp"
-                android:layout_height="match_parent"
-                android:gravity="center_vertical"
-                android:paddingRight="7dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_centerVertical="true"
+                android:paddingBottom="2dp"
                 android:text="Number of Rows (Min: 9):"
                 android:textColor="#000"
-                android:textSize="18sp" />
+                android:textSize="19sp" />
 
             <EditText
                 android:id="@+id/rText"
                 android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:gravity="center"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
                 android:hint="00"
                 android:inputType="number"
                 android:maxLength="2"
-                android:textSize="20sp" />
+                android:textSize="21sp" />
 
-        </LinearLayout>
+        </RelativeLayout>
 
-        <LinearLayout
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:paddingBottom="14dp">
+            android:layout_height="56dp"
+            android:layout_marginBottom="16dp"
+            android:background="@drawable/rounded_corners"
+            android:backgroundTint="@color/colorPrimary"
+            android:paddingLeft="20dp"
+            android:paddingRight="20dp">
 
             <TextView
-                android:layout_width="240dp"
-                android:layout_height="match_parent"
-                android:gravity="center_vertical"
-                android:paddingRight="7dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_centerVertical="true"
+                android:paddingBottom="2dp"
                 android:text="Number of Cols (Min: 6):"
                 android:textColor="#000"
-                android:textSize="18sp" />
+                android:textSize="19sp" />
 
             <EditText
                 android:id="@+id/cText"
                 android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:gravity="center"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
                 android:hint="00"
                 android:inputType="number"
                 android:maxLength="2"
-                android:textSize="20sp" />
+                android:textSize="21sp" />
 
-        </LinearLayout>
+        </RelativeLayout>
 
-        <LinearLayout
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:paddingBottom="24dp">
+            android:layout_height="56dp"
+            android:layout_marginBottom="16dp"
+            android:background="@drawable/rounded_corners"
+            android:backgroundTint="@color/colorPrimary"
+            android:paddingLeft="20dp"
+            android:paddingRight="20dp">
 
             <TextView
+                android:id="@+id/dif_text"
                 android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:gravity="center"
-                android:paddingRight="7dp"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_centerVertical="true"
+                android:paddingBottom="2dp"
                 android:text="Difficulty:"
                 android:textColor="#000"
-                android:textSize="18sp" />
+                android:textSize="20sp" />
 
             <Spinner
                 android:id="@+id/dif_spinner"
+                style="?attr/spinnerDropDownItemStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:entries="@array/difficulty_array"
-                android:gravity="center" />
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="8dp"
+                android:layout_toRightOf="@id/dif_text"
+                android:entries="@array/difficulty_array" />
 
-        </LinearLayout>
+        </RelativeLayout>
 
-        <LinearLayout
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:paddingBottom="20dp">
+            android:layout_height="56dp"
+            android:layout_marginBottom="16dp"
+            android:background="@drawable/rounded_corners"
+            android:backgroundTint="@color/colorPrimary"
+            android:onClick="setLongpress"
+            android:paddingLeft="20dp"
+            android:paddingRight="20dp">
 
             <TextView
-                android:layout_width="120dp"
-                android:layout_height="match_parent"
-                android:gravity="center_vertical"
-                android:paddingRight="16dp"
-                android:text="Vibration:"
-                android:textColor="#000"
-                android:textSize="18sp" />
-
-            <CheckBox
-                android:id="@+id/cbVibration"
                 android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:gravity="center"
-                android:onClick="setVibration" />
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:paddingBottom="20dp">
-
-            <TextView
-                android:layout_width="120dp"
-                android:layout_height="match_parent"
-                android:gravity="center_vertical"
-                android:paddingRight="16dp"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_centerVertical="true"
+                android:paddingBottom="2dp"
                 android:text="Longpress:"
                 android:textColor="#000"
-                android:textSize="18sp" />
+                android:textSize="20sp" />
 
             <CheckBox
                 android:id="@+id/cbLongpress"
                 android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:gravity="center"
-                android:onClick="setLongpress" />
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true" />
 
-        </LinearLayout>
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginBottom="16dp"
+            android:background="@drawable/rounded_corners"
+            android:backgroundTint="@color/colorPrimary"
+            android:onClick="setVibration"
+            android:paddingLeft="20dp"
+            android:paddingRight="20dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_centerVertical="true"
+                android:paddingBottom="2dp"
+                android:text="Vibration:"
+                android:textColor="#000"
+                android:textSize="20sp" />
+
+            <CheckBox
+                android:id="@+id/cbVibration"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true" />
+
+        </RelativeLayout>
 
     </LinearLayout>
 
@@ -157,7 +186,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
-        android:padding="10dp"
+        android:padding="12dp"
         android:text="Version X.X.X"
         android:textSize="15sp" />
 
