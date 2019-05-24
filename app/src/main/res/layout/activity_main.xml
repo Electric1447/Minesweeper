@@ -13,21 +13,32 @@
         android:background="@color/colorPrimaryDarker"
         android:orientation="vertical">
 
-        <android.support.design.widget.CoordinatorLayout
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="@color/colorPrimaryDark"
             android:elevation="4dp"
             android:orientation="horizontal">
 
+            <ImageButton
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="7dp"
+                android:layout_toRightOf="@id/timerll"
+                android:background="@drawable/ic_settings_applications_dgrey_24dp"
+                android:onClick="goSettings"
+                android:scaleType="center"
+                android:scaleX="1.2"
+                android:scaleY="1.2" />
+
             <LinearLayout
                 android:id="@+id/timerll"
                 android:layout_width="120dp"
                 android:layout_height="45dp"
-                android:layout_gravity="center_vertical"
+                android:layout_centerVertical="true"
                 android:layout_marginLeft="12dp"
                 android:background="@drawable/timer_background"
-                android:gravity="center"
                 android:orientation="horizontal"
                 android:scaleType="center"
                 android:textColor="#FF0000"
@@ -60,17 +71,9 @@
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="45dp"
-                android:layout_gravity="center_vertical|right"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
                 android:layout_marginRight="12dp">
-
-                <ImageButton
-                    android:layout_width="36dp"
-                    android:layout_height="36dp"
-                    android:layout_gravity="center_vertical"
-                    android:layout_marginRight="5dp"
-                    android:background="@drawable/ic_settings_applications_dgrey_24dp"
-                    android:onClick="goSettings"
-                    android:scaleType="center" />
 
                 <ImageButton
                     android:id="@+id/switchPointer"
@@ -101,11 +104,11 @@
                 android:id="@+id/smiley"
                 android:layout_width="45dp"
                 android:layout_height="45dp"
-                android:layout_gravity="center"
+                android:layout_centerInParent="true"
                 android:background="@drawable/smiley"
                 android:scaleType="center" />
 
-        </android.support.design.widget.CoordinatorLayout>
+        </RelativeLayout>
 
         <GridLayout
             android:id="@+id/gl"

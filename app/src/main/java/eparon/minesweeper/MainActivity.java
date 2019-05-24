@@ -51,6 +51,7 @@ public class MainActivity extends AppCompatActivity {
     boolean flag = false;
     double difficulty = Difficulty.HARD;
     boolean longpress = true, vibration = true;
+    int[] bestTime = new int[4];
 
     GridLayout gridLayout;
     Spec[] row, col;
@@ -107,6 +108,9 @@ public class MainActivity extends AppCompatActivity {
         difficulty = Double.parseDouble(prefs.getString("difficulty", String.valueOf(difficulty)));
         longpress = prefs.getBoolean("longpress", longpress);
         vibration = prefs.getBoolean("vibration", vibration);
+
+        for (int i = 0; i < bestTime.length; i++)
+            bestTime[i] = prefs.getInt("bestTime" + i, bestTime[i]);
 
         board = new Board(rows, cols);
         numberOfBombs = (int)((rows * cols) / difficulty);
@@ -338,8 +342,18 @@ public class MainActivity extends AppCompatActivity {
         pw.setElevation(5.0f);
         pw.showAtLocation(findViewById(R.id.cl), Gravity.CENTER,0,0);
 
-        TextView Message = customView.findViewById(R.id.message);
-        Message.setText(String.format("%s\nTime: %s:%s", getResources().getString(R.string.win_msg), TimerText[0].getText().toString(), TimerText[1].getText().toString()));
+        int time = Integer.parseInt(TimerText[0].getText().toString()) * 60 + Integer.parseInt(TimerText[1].getText().toString());
+        int pos = Difficulty.valueToPosition(difficulty);
+        if (time < bestTime[pos] || bestTime[pos] == 0) {
+            bestTime[pos] = time;
+            SharedPreferences.Editor editor = prefs.edit();
+            editor.putInt("bestTime" + pos, bestTime[pos]);
+            editor.apply();
+        }
+        TextView TimeMsg = customView.findViewById(R.id.timeMsg);
+        TextView BestTimeMsg = customView.findViewById(R.id.besttimeMsg);
+        TimeMsg.setText(String.format("%s:%s", TimerText[0].getText().toString(), TimerText[1].getText().toString()));
+        BestTimeMsg.setText(String.format(Locale.getDefault(), "%02d:%02d", bestTime[pos] / 60, bestTime[pos] % 60));
 
         timerHandler.removeCallbacks(timerRunnable);
     }

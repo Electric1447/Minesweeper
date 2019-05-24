@@ -26,37 +26,13 @@ public class Settings extends AppCompatActivity implements AdapterView.OnItemSel
     TextView Rows, Cols;
 
     double difficulty = Difficulty.HARD;
-    double[] difArr = new double[]{Difficulty.EASY, Difficulty.NORMAL, Difficulty.HARD, Difficulty.EXTREME};
     Spinner difSpinner;
 
     boolean longpress = true, vibration = true;
     CheckBox longpressCB, vibrationCB;
 
     @Override
-    public void onBackPressed() {
-        if (Rows.getText().toString().equals("")) Rows.setText(String.valueOf(rows));
-        if (Cols.getText().toString().equals("")) Cols.setText(String.valueOf(cols));
-
-        rows = Integer.valueOf(Rows.getText().toString());
-        cols = Integer.valueOf(Cols.getText().toString());
-
-        if (rows > 24 || rows < 9)
-            Toast.makeText(this, "Rows number should be between 9 to 24", Toast.LENGTH_LONG).show();
-        else {
-            if (cols > 16 || cols < 6)
-                Toast.makeText(this, "Cols number should be between 6 to 16", Toast.LENGTH_LONG).show();
-            else {
-                SharedPreferences.Editor editor = prefs.edit();
-                editor.putInt("rows", rows);
-                editor.putInt("cols", cols);
-                editor.putString("difficulty", String.valueOf(difficulty));
-                editor.putBoolean("longpress", longpress);
-                editor.putBoolean("vibration", vibration);
-                editor.apply();
-                startActivity(new Intent(Settings.this, MainActivity.class));
-            }
-        }
-    }
+    public void onBackPressed() { Save(); }
 
 
     @Override
@@ -80,7 +56,7 @@ public class Settings extends AppCompatActivity implements AdapterView.OnItemSel
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         difSpinner.setAdapter(adapter);
         difSpinner.setOnItemSelectedListener(this);
-        difSpinner.setSelection((int)(6 - difficulty));
+        difSpinner.setSelection(Difficulty.valueToPosition(difficulty));
 
         longpressCB = findViewById(R.id.cbLongpress);
         longpressCB.setChecked(longpress);
@@ -93,7 +69,7 @@ public class Settings extends AppCompatActivity implements AdapterView.OnItemSel
 
     @Override
     public void onItemSelected(AdapterView<?> adapterView, View view, int position, long l) {
-        difficulty = difArr[position];
+        difficulty = Difficulty.positionToValue(position);
     }
 
     @Override
@@ -107,6 +83,33 @@ public class Settings extends AppCompatActivity implements AdapterView.OnItemSel
     public void setVibration (View view) {
         vibrationCB.setChecked(!vibrationCB.isChecked());
         vibration = vibrationCB.isChecked();
+    }
+
+    public void goBack (View view) { Save(); }
+
+    private void Save () {
+        if (Rows.getText().toString().equals("")) Rows.setText(String.valueOf(rows));
+        if (Cols.getText().toString().equals("")) Cols.setText(String.valueOf(cols));
+
+        rows = Integer.valueOf(Rows.getText().toString());
+        cols = Integer.valueOf(Cols.getText().toString());
+
+        if (rows > 24 || rows < 9)
+            Toast.makeText(this, "Rows number should be between 9 to 24", Toast.LENGTH_LONG).show();
+        else {
+            if (cols > 16 || cols < 6)
+                Toast.makeText(this, "Cols number should be between 6 to 16", Toast.LENGTH_LONG).show();
+            else {
+                SharedPreferences.Editor editor = prefs.edit();
+                editor.putInt("rows", rows);
+                editor.putInt("cols", cols);
+                editor.putString("difficulty", String.valueOf(difficulty));
+                editor.putBoolean("longpress", longpress);
+                editor.putBoolean("vibration", vibration);
+                editor.apply();
+                startActivity(new Intent(Settings.this, MainActivity.class));
+            }
+        }
     }
 
 }

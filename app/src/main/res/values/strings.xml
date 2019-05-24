@@ -2,6 +2,8 @@
     <string name="app_name">Minesweeper</string>
 
     <string name="win_msg">You Win!</string>
+    <string name="time_msg">Time:</string>
+    <string name="besttime_msg">Best Time:</string>
 
     <string-array name="difficulty_array">
         <item>Easy</item>
