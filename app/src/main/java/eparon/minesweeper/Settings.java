@@ -20,6 +20,8 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.Locale;
+
 import eparon.minesweeper.Game.Difficulty;
 
 @SuppressLint("SetTextI18n")
@@ -60,6 +62,8 @@ public class Settings extends AppCompatActivity implements AdapterView.OnItemSel
 
         Rows = findViewById(R.id.rText);
         Cols = findViewById(R.id.cText);
+        Rows.setHint(String.format(Locale.getDefault(), "%02d", rows));
+        Cols.setHint(String.format(Locale.getDefault(), "%02d", cols));
 
         difSpinner = findViewById(R.id.dif_spinner);
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this, R.array.difficulty_array, android.R.layout.simple_spinner_item);
