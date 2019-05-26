@@ -5,6 +5,7 @@ public class Board {
     private Cell[][] cell;
     private final int rows;
     private final int cols;
+    private boolean enabled = true;
 
     public Board(int r, int c) {
 
@@ -23,15 +24,21 @@ public class Board {
     }
 
     public void resetState () {
+        enabled = true;
         for (int i = 0; i < this.rows; i++)
             for (int j = 0; j < this.cols; j++)
                 this.cell[i][j].resetState();
     }
 
     public void Disable () {
+        enabled = false;
         for (int i = 0; i < this.rows; i++)
             for (int j = 0; j < this.cols; j++)
                 this.cell[i][j].setClicked(true);
+    }
+
+    public boolean isEnabled () {
+        return this.enabled;
     }
 
     public void detectBombs () {

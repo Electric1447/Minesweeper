@@ -1,9 +1,21 @@
 <resources>
     <string name="app_name">Minesweeper</string>
+    <string name="ad_cb">Don\'t show this again.</string>
 
     <string name="win_msg">You Win!</string>
     <string name="time_msg">Time:</string>
     <string name="besttime_msg">Best Time:</string>
+
+
+    <string name="ad_rg_title">Start New Game?</string>
+    <string name="ad_rg_message">This will reset your current progress.</string>
+    <string name="ad_rg_positive">Yes</string>
+    <string name="ad_rg_negative">No</string>
+
+    <string name="ad_oob_title">Warning</string>
+    <string name="ad_oob_message">Some of the Row might be out of the screen.</string>
+    <string name="ad_oob_positive">OK</string>
+    <string name="ad_oob_negative">Cancel</string>
 
     <string-array name="difficulty_array">
         <item>Easy</item>

@@ -20,18 +20,6 @@
             android:elevation="4dp"
             android:orientation="horizontal">
 
-            <ImageButton
-                android:layout_width="32dp"
-                android:layout_height="32dp"
-                android:layout_centerVertical="true"
-                android:layout_marginLeft="7dp"
-                android:layout_toRightOf="@id/timerll"
-                android:background="@drawable/ic_settings_applications_dgrey_24dp"
-                android:onClick="goSettings"
-                android:scaleType="center"
-                android:scaleX="1.2"
-                android:scaleY="1.2" />
-
             <LinearLayout
                 android:id="@+id/timerll"
                 android:layout_width="120dp"
@@ -107,6 +95,18 @@
                 android:layout_centerInParent="true"
                 android:background="@drawable/smiley"
                 android:scaleType="center" />
+
+            <ImageButton
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_centerVertical="true"
+                android:layout_marginRight="10dp"
+                android:layout_toLeftOf="@id/smiley"
+                android:background="@drawable/ic_settings_applications_dgrey_24dp"
+                android:onClick="goSettings"
+                android:scaleType="center"
+                android:scaleX="1.2"
+                android:scaleY="1.2" />
 
         </RelativeLayout>
 

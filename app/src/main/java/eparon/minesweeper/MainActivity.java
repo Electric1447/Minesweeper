@@ -15,8 +15,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.View.*;
+import android.view.View.OnLongClickListener;
+import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
 import android.widget.FrameLayout;
 import android.widget.GridLayout;
 import android.widget.GridLayout.LayoutParams;
@@ -26,7 +28,8 @@ import android.widget.ImageView;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 
-import java.io.File;
+import org.apache.commons.io.FileUtils;
+
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Random;
@@ -50,7 +53,7 @@ public class MainActivity extends AppCompatActivity {
     int bombs, flags;
     boolean flag = false;
     double difficulty = Difficulty.HARD;
-    boolean longpress = true, vibration = true;
+    boolean longpress = true, vibration = true, showADRG = true;
     int[] bestTime = new int[4];
 
     GridLayout gridLayout;
@@ -91,7 +94,7 @@ public class MainActivity extends AppCompatActivity {
 
     Drawable cuaDrawable, flagDrawable, flag2Drawable, bombDrawable, smileyDrawable, smiley2Drawable, smiley3Drawable;
 
-    PopupWindow pw;
+    PopupWindow pw, ad;
 
     @Override
     public void onBackPressed() { }
@@ -108,6 +111,7 @@ public class MainActivity extends AppCompatActivity {
         difficulty = Double.parseDouble(prefs.getString("difficulty", String.valueOf(difficulty)));
         longpress = prefs.getBoolean("longpress", longpress);
         vibration = prefs.getBoolean("vibration", vibration);
+        showADRG = prefs.getBoolean("showADRG", showADRG);
 
         for (int i = 0; i < bestTime.length; i++)
             bestTime[i] = prefs.getInt("bestTime" + i, bestTime[i]);
@@ -152,13 +156,16 @@ public class MainActivity extends AppCompatActivity {
                         break;
                     case MotionEvent.ACTION_UP:
                     case MotionEvent.ACTION_CANCEL:
-                        Init();
+                        if (showADRG && board.isEnabled())
+                            newGameAlert();
+                        else
+                            Init();
                         new Handler().postDelayed(new Runnable() {
                             @Override
                             public void run () {
                                 smiley.setImageDrawable(smileyDrawable);
                             }
-                        }, 50);
+                        }, 40);
                         break;
                 }
                 return true;
@@ -340,6 +347,7 @@ public class MainActivity extends AppCompatActivity {
 
         pw = new PopupWindow(customView, ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         pw.setElevation(5.0f);
+        pw.setAnimationStyle(R.style.PopupWindowAnimation);
         pw.showAtLocation(findViewById(R.id.cl), Gravity.CENTER,0,0);
 
         int time = Integer.parseInt(TimerText[0].getText().toString()) * 60 + Integer.parseInt(TimerText[1].getText().toString());
@@ -401,29 +409,58 @@ public class MainActivity extends AppCompatActivity {
         else view.setBackground(bombDrawable);
     }
 
+    private void newGameAlert () {
+        if (ad != null) ad.dismiss();
+
+        // Creating the custom AlertDialog
+        View customView = View.inflate(this, R.layout.custom_alertdialog, null);
+
+        ad = new PopupWindow(customView, ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        ad.setElevation(5.0f);
+        ad.setAnimationStyle(R.style.PopupWindowAnimation);
+        ad.showAtLocation(findViewById(R.id.cl), Gravity.CENTER,0,0);
+
+        TextView Title = customView.findViewById(R.id.title);
+        TextView Message = customView.findViewById(R.id.message);
+        TextView Positive = customView.findViewById(R.id.positive);
+        TextView Negative = customView.findViewById(R.id.negative);
+        final CheckBox CheckBox = customView.findViewById(R.id.cb);
+
+        Title.setText(R.string.ad_rg_title);
+        Message.setText(R.string.ad_rg_message);
+        Positive.setText(R.string.ad_rg_positive);
+        Negative.setText(R.string.ad_rg_negative);
+
+        Positive.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                showADRG = !CheckBox.isChecked();
+                SharedPreferences.Editor editor = prefs.edit();
+                editor.putBoolean("showADRG", showADRG);
+                editor.apply();
+                ad.dismiss();
+                Init();
+            }
+        });
+
+        Negative.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                showADRG = !CheckBox.isChecked();
+                SharedPreferences.Editor editor = prefs.edit();
+                editor.putBoolean("showADRG", showADRG);
+                editor.apply();
+                ad.dismiss();
+            }
+        });
+    }
+
     public void goSettings (View view) {
         startActivity(new Intent(MainActivity.this, Settings.class));
     }
 
-    public static void deleteCache(Context context) {
-        try {
-            File dir = context.getCacheDir();
-            deleteDir(dir);
-        } catch (Exception e) { e.printStackTrace(); }
-    }
-
-    public static boolean deleteDir(File dir) {
-        if (dir != null && dir.isDirectory()) {
-            String[] children = dir.list();
-            for (String child : children)
-                if (!deleteDir(new File(dir, child)))
-                    return false;
-            return dir.delete();
-        } else if (dir!= null && dir.isFile()) {
-            return dir.delete();
-        } else {
-            return false;
-        }
+    public static void deleteCache (Context context) {
+        FileUtils.deleteQuietly(context.getCacheDir());
     }
 
 }

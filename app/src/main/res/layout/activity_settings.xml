@@ -2,185 +2,221 @@
 <android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/cl"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/colorPrimaryDark"
     tools:context="eparon.minesweeper.Settings"
     tools:ignore="Autofill,HardcodedText,RtlHardcoded,RtlSymmetry,RelativeOverlap">
 
-    <LinearLayout
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:padding="12dp">
+        android:layout_height="match_parent">
 
-        <TextView
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="36dp"
-            android:background="@drawable/rounded_corners"
-            android:backgroundTint="@color/colorPrimary"
-            android:fontFamily="sans-serif-condensed-medium"
-            android:gravity="center"
-            android:paddingTop="12dp"
-            android:paddingBottom="16dp"
-            android:text="Settings"
-            android:textColor="#000"
-            android:textSize="48sp" />
-
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="56dp"
-            android:layout_marginBottom="16dp"
-            android:background="@drawable/rounded_corners"
-            android:backgroundTint="@color/colorPrimary"
-            android:paddingLeft="20dp"
-            android:paddingRight="20dp">
+            android:orientation="vertical"
+            android:padding="12dp">
 
             <TextView
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
-                android:layout_centerVertical="true"
-                android:paddingBottom="2dp"
-                android:text="Number of Rows (Min: 9):"
+                android:layout_marginBottom="36dp"
+                android:background="@drawable/rounded_corners"
+                android:backgroundTint="@color/colorPrimary"
+                android:fontFamily="sans-serif-condensed-medium"
+                android:gravity="center"
+                android:paddingTop="12dp"
+                android:paddingBottom="16dp"
+                android:text="Settings"
                 android:textColor="#000"
-                android:textSize="19sp" />
+                android:textSize="48sp" />
 
-            <EditText
-                android:id="@+id/rText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:hint="00"
-                android:inputType="number"
-                android:maxLength="2"
-                android:textSize="21sp" />
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:layout_marginBottom="16dp"
+                android:background="@drawable/rounded_corners"
+                android:backgroundTint="@color/colorPrimary"
+                android:paddingLeft="20dp"
+                android:paddingRight="20dp">
 
-        </RelativeLayout>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true"
+                    android:layout_centerVertical="true"
+                    android:paddingBottom="2dp"
+                    android:text="Number of Rows (Min: 9):"
+                    android:textColor="#000"
+                    android:textSize="19sp" />
 
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="56dp"
-            android:layout_marginBottom="16dp"
-            android:background="@drawable/rounded_corners"
-            android:backgroundTint="@color/colorPrimary"
-            android:paddingLeft="20dp"
-            android:paddingRight="20dp">
+                <EditText
+                    android:id="@+id/rText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:hint="00"
+                    android:inputType="number"
+                    android:maxLength="2"
+                    android:textSize="21sp" />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
-                android:layout_centerVertical="true"
-                android:paddingBottom="2dp"
-                android:text="Number of Cols (Min: 6):"
-                android:textColor="#000"
-                android:textSize="19sp" />
+            </RelativeLayout>
 
-            <EditText
-                android:id="@+id/cText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:hint="00"
-                android:inputType="number"
-                android:maxLength="2"
-                android:textSize="21sp" />
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:layout_marginBottom="16dp"
+                android:background="@drawable/rounded_corners"
+                android:backgroundTint="@color/colorPrimary"
+                android:paddingLeft="20dp"
+                android:paddingRight="20dp">
 
-        </RelativeLayout>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true"
+                    android:layout_centerVertical="true"
+                    android:paddingBottom="2dp"
+                    android:text="Number of Cols (Min: 6):"
+                    android:textColor="#000"
+                    android:textSize="19sp" />
 
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="56dp"
-            android:layout_marginBottom="16dp"
-            android:background="@drawable/rounded_corners"
-            android:backgroundTint="@color/colorPrimary"
-            android:paddingLeft="20dp"
-            android:paddingRight="20dp">
+                <EditText
+                    android:id="@+id/cText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:hint="00"
+                    android:inputType="number"
+                    android:maxLength="2"
+                    android:textSize="21sp" />
 
-            <TextView
-                android:id="@+id/dif_text"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
-                android:layout_centerVertical="true"
-                android:paddingBottom="2dp"
-                android:text="Difficulty:"
-                android:textColor="#000"
-                android:textSize="20sp" />
+            </RelativeLayout>
 
-            <Spinner
-                android:id="@+id/dif_spinner"
-                style="?attr/spinnerDropDownItemStyle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:layout_marginLeft="8dp"
-                android:layout_toRightOf="@id/dif_text"
-                android:entries="@array/difficulty_array" />
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:layout_marginBottom="16dp"
+                android:background="@drawable/rounded_corners"
+                android:backgroundTint="@color/colorPrimary"
+                android:paddingLeft="20dp"
+                android:paddingRight="20dp">
 
-        </RelativeLayout>
+                <TextView
+                    android:id="@+id/dif_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true"
+                    android:layout_centerVertical="true"
+                    android:paddingBottom="2dp"
+                    android:text="Difficulty:"
+                    android:textColor="#000"
+                    android:textSize="20sp" />
 
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="56dp"
-            android:layout_marginBottom="16dp"
-            android:background="@drawable/rounded_corners"
-            android:backgroundTint="@color/colorPrimary"
-            android:onClick="setLongpress"
-            android:paddingLeft="20dp"
-            android:paddingRight="20dp">
+                <Spinner
+                    android:id="@+id/dif_spinner"
+                    style="?attr/spinnerDropDownItemStyle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="8dp"
+                    android:layout_toRightOf="@id/dif_text"
+                    android:entries="@array/difficulty_array" />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
-                android:layout_centerVertical="true"
-                android:paddingBottom="2dp"
-                android:text="Longpress:"
-                android:textColor="#000"
-                android:textSize="20sp" />
+            </RelativeLayout>
 
-            <CheckBox
-                android:id="@+id/cbLongpress"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:layout_centerVertical="true" />
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:layout_marginBottom="16dp"
+                android:background="@drawable/rounded_corners"
+                android:backgroundTint="@color/colorPrimary"
+                android:onClick="setLongpress"
+                android:paddingLeft="20dp"
+                android:paddingRight="20dp">
 
-        </RelativeLayout>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true"
+                    android:layout_centerVertical="true"
+                    android:paddingBottom="2dp"
+                    android:text="Longpress:"
+                    android:textColor="#000"
+                    android:textSize="20sp" />
 
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="56dp"
-            android:layout_marginBottom="16dp"
-            android:background="@drawable/rounded_corners"
-            android:backgroundTint="@color/colorPrimary"
-            android:onClick="setVibration"
-            android:paddingLeft="20dp"
-            android:paddingRight="20dp">
+                <CheckBox
+                    android:id="@+id/cbLongpress"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true" />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
-                android:layout_centerVertical="true"
-                android:paddingBottom="2dp"
-                android:text="Vibration:"
-                android:textColor="#000"
-                android:textSize="20sp" />
+            </RelativeLayout>
 
-            <CheckBox
-                android:id="@+id/cbVibration"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:layout_centerVertical="true" />
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:layout_marginBottom="16dp"
+                android:background="@drawable/rounded_corners"
+                android:backgroundTint="@color/colorPrimary"
+                android:onClick="setVibration"
+                android:paddingLeft="20dp"
+                android:paddingRight="20dp">
 
-        </RelativeLayout>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true"
+                    android:layout_centerVertical="true"
+                    android:paddingBottom="2dp"
+                    android:text="Vibration:"
+                    android:textColor="#000"
+                    android:textSize="20sp" />
 
-    </LinearLayout>
+                <CheckBox
+                    android:id="@+id/cbVibration"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true" />
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:layout_marginBottom="16dp"
+                android:background="@drawable/rounded_corners"
+                android:backgroundTint="@color/colorPrimary"
+                android:onClick="setADRG"
+                android:paddingLeft="20dp"
+                android:paddingRight="20dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true"
+                    android:layout_centerVertical="true"
+                    android:paddingBottom="2dp"
+                    android:text="New Game Dialog:"
+                    android:textColor="#000"
+                    android:textSize="20sp" />
+
+                <CheckBox
+                    android:id="@+id/cbADRG"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true" />
+
+            </RelativeLayout>
+
+        </LinearLayout>
+
+    </ScrollView>
 
     <TextView
         android:id="@+id/ver"
@@ -188,7 +224,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
         android:layout_margin="16dp"
-        android:text="Version X.X.X"
+        android:text="Version X.X.X \nCreated by Itai Levin."
         android:textSize="15sp" />
 
     <android.support.design.widget.FloatingActionButton
