@@ -53,7 +53,7 @@ public class MainActivity extends AppCompatActivity {
     int bombs, flags;
     boolean flag = false;
     double difficulty = Difficulty.HARD;
-    boolean longpress = true, vibration = true, showADRG = true;
+    boolean win, adRuuning = false, longpress = true, vibration = true, showADRG = true;
     int[] bestTime = new int[4];
 
     GridLayout gridLayout;
@@ -74,9 +74,8 @@ public class MainActivity extends AppCompatActivity {
     //runs without a timer by reposting this handler at the end of the runnable
     Handler timerHandler = new Handler();
     Runnable timerRunnable = new Runnable() {
-
         @Override
-        public void run() {
+        public void run () {
             long millis = System.currentTimeMillis() - startTime;
             int seconds = (int)(millis / 1000);
             int minutes = seconds / 60;
@@ -97,10 +96,11 @@ public class MainActivity extends AppCompatActivity {
     PopupWindow pw, ad;
 
     @Override
-    public void onBackPressed() { }
+    public void onBackPressed () {
+    }
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate (Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -149,16 +149,16 @@ public class MainActivity extends AppCompatActivity {
         smiley.setImageDrawable(smileyDrawable);
         smiley.setOnTouchListener(new OnTouchListener() {
             @Override
-            public boolean onTouch(View v, MotionEvent event) {
+            public boolean onTouch (View v, MotionEvent event) {
                 switch (event.getAction()) {
                     case MotionEvent.ACTION_DOWN:
                         smiley.setImageDrawable(smiley3Drawable);
                         break;
                     case MotionEvent.ACTION_UP:
                     case MotionEvent.ACTION_CANCEL:
-                        if (showADRG && board.isEnabled())
+                        if (showADRG && board.getState() && !adRuuning && !win)
                             newGameAlert();
-                        else
+                        else if (!adRuuning)
                             Init();
                         new Handler().postDelayed(new Runnable() {
                             @Override
@@ -196,23 +196,23 @@ public class MainActivity extends AppCompatActivity {
         Init();
     }
 
-    private void Init() {
+    private void Init () {
 
         deleteCache(this);
 
         gameTurn = 0;
+        win = false;
 
         timerHandler.removeCallbacks(timerRunnable);
         TimerText[0].setText("00");
         TimerText[1].setText("00");
 
         if (pw != null) pw.dismiss();
-        if (ad != null) ad.dismiss();
 
         bombs = numberOfBombs;
         flags = numberOfBombs;
 
-        BombsCounter.setText(String.format(Locale.getDefault(),"%02d", flags));
+        BombsCounter.setText(String.format(Locale.getDefault(), "%02d", flags));
 
         board.resetState();
 
@@ -224,7 +224,7 @@ public class MainActivity extends AppCompatActivity {
                 ib[i][j] = v.findViewById(R.id.image);
 
                 if (fl[i][j].getParent() != null)
-                    ((ViewGroup) fl[i][j].getParent()).removeView(fl[i][j]);
+                    ((ViewGroup)fl[i][j].getParent()).removeView(fl[i][j]);
 
                 LayoutParams lp = new LayoutParams(row[i], col[j]);
                 lp.width = slotWidth;
@@ -237,19 +237,19 @@ public class MainActivity extends AppCompatActivity {
                 final int finalI = i, finalJ = j;
                 ib[i][j].setOnClickListener(new View.OnClickListener() {
                     @Override
-                    public void onClick(View view) {
+                    public void onClick (View view) {
                         clickCell(finalI, finalJ, flag);
                     }
                 });
                 if (longpress) {
                     ib[i][j].setOnLongClickListener(new OnLongClickListener() {
                         @Override
-                        public boolean onLongClick(View v) {
-                            if (vibration && !board.getCell(finalI, finalJ).isClicked())
+                        public boolean onLongClick (View v) {
+                            if (vibration && !board.getCell(finalI, finalJ).isClicked() && board.getState())
                                 if (Build.VERSION.SDK_INT >= 26)
-                                    ((Vibrator) Objects.requireNonNull(getSystemService(VIBRATOR_SERVICE))).vibrate(VibrationEffect.createOneShot(100, VibrationEffect.DEFAULT_AMPLITUDE));
+                                    ((Vibrator)Objects.requireNonNull(getSystemService(VIBRATOR_SERVICE))).vibrate(VibrationEffect.createOneShot(100, VibrationEffect.DEFAULT_AMPLITUDE));
                                 else
-                                    ((Vibrator) Objects.requireNonNull(getSystemService(VIBRATOR_SERVICE))).vibrate(100);
+                                    ((Vibrator)Objects.requireNonNull(getSystemService(VIBRATOR_SERVICE))).vibrate(100);
                             clickCell(finalI, finalJ, !flag);
                             return true;
                         }
@@ -264,7 +264,7 @@ public class MainActivity extends AppCompatActivity {
         gridLayout.setLayoutParams(lp);
     }
 
-    private void startBoardGeneration() {
+    private void startBoardGeneration () {
 
         Random r = new Random();
         int counter = 0;
@@ -287,7 +287,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    private void revealCell(int rowPos, int colPos, boolean putFlag) {
+    private void revealCell (int rowPos, int colPos, boolean putFlag) {
 
         // If it hasn't been clicked yet.
         if (!board.getCell(rowPos, colPos).isClicked()) {
@@ -320,7 +320,7 @@ public class MainActivity extends AppCompatActivity {
                                     ib[i][j].setImageDrawable(images[board.getCell(i, j).getValue() + 1]);
                                 else if (board.getCell(i, j).getValue() != -1)
                                     ib[i][j].setImageDrawable(flag2Drawable);
-                        board.Disable();
+                        board.setState(false);
                         break;
                     case 0:
                         ib[rowPos][colPos].setImageDrawable(images[board.getCell(rowPos, colPos).getValue() + 1]);
@@ -340,10 +340,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void winGame () {
-
-        if (ad != null) ad.dismiss();
-
-        board.Disable();
+        win = true;
+        board.setState(false);
 
         // Creating the custom Popup message
         View customView = View.inflate(this, R.layout.popup_layout, null);
@@ -351,7 +349,7 @@ public class MainActivity extends AppCompatActivity {
         pw = new PopupWindow(customView, ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         pw.setElevation(5.0f);
         pw.setAnimationStyle(R.style.PopupWindowAnimation);
-        pw.showAtLocation(findViewById(R.id.cl), Gravity.CENTER,0,0);
+        pw.showAtLocation(findViewById(R.id.cl), Gravity.CENTER, 0, 0);
 
         int time = Integer.parseInt(TimerText[0].getText().toString()) * 60 + Integer.parseInt(TimerText[1].getText().toString());
         int pos = Difficulty.valueToPosition(difficulty);
@@ -370,17 +368,19 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void clickCell (final int r, final int c, boolean clickType) {
-        if (board.getCell(r, c).isClicked()) {
-            if (board.countSurroundingFlags(r, c) >= board.getCell(r, c).getValue())
-                revealSurroundingCells(r, c);
-        } else {
-            if (gameTurn == 0 && !clickType) {
-                startTime = System.currentTimeMillis();
-                timerHandler.postDelayed(timerRunnable, 0);
-                firstCell = r * cols + c;
-                startBoardGeneration();
+        if (board.getState()) {
+            if (board.getCell(r, c).isClicked()) {
+                if (board.countSurroundingFlags(r, c) >= board.getCell(r, c).getValue())
+                    revealSurroundingCells(r, c);
+            } else {
+                if (gameTurn == 0 && !clickType) {
+                    startTime = System.currentTimeMillis();
+                    timerHandler.postDelayed(timerRunnable, 0);
+                    firstCell = r * cols + c;
+                    startBoardGeneration();
+                }
+                revealCell(r, c, clickType);
             }
-            revealCell(r, c, clickType);
         }
     }
 
@@ -395,7 +395,7 @@ public class MainActivity extends AppCompatActivity {
         RSC2(r + 1, c + 1); // Bottom Right
     }
 
-    private void RSC2(final int r, final int c) {
+    private void RSC2 (final int r, final int c) {
         if (board.inbounds(r, c)) revealCell(r, c, false);
     }
 
@@ -414,6 +414,8 @@ public class MainActivity extends AppCompatActivity {
 
     private void newGameAlert () {
         if (ad != null) ad.dismiss();
+        adRuuning = true;
+        board.setState(false);
 
         // Creating the custom AlertDialog
         View customView = View.inflate(this, R.layout.custom_alertdialog, null);
@@ -421,7 +423,7 @@ public class MainActivity extends AppCompatActivity {
         ad = new PopupWindow(customView, ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         ad.setElevation(5.0f);
         ad.setAnimationStyle(R.style.PopupWindowAnimation);
-        ad.showAtLocation(findViewById(R.id.cl), Gravity.CENTER,0,0);
+        ad.showAtLocation(findViewById(R.id.cl), Gravity.CENTER, 0, 0);
 
         TextView Title = customView.findViewById(R.id.title);
         TextView Message = customView.findViewById(R.id.message);
@@ -436,23 +438,27 @@ public class MainActivity extends AppCompatActivity {
 
         Positive.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
+            public void onClick (View view) {
                 showADRG = !CheckBox.isChecked();
                 SharedPreferences.Editor editor = prefs.edit();
                 editor.putBoolean("showADRG", showADRG);
                 editor.apply();
                 ad.dismiss();
+                board.setState(true);
+                adRuuning = false;
                 Init();
             }
         });
 
         Negative.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
+            public void onClick (View view) {
                 showADRG = !CheckBox.isChecked();
                 SharedPreferences.Editor editor = prefs.edit();
                 editor.putBoolean("showADRG", showADRG);
                 editor.apply();
+                board.setState(true);
+                adRuuning = false;
                 ad.dismiss();
             }
         });
