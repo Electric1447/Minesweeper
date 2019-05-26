@@ -341,6 +341,8 @@ public class MainActivity extends AppCompatActivity {
 
     private void winGame () {
 
+        if (ad != null) ad.dismiss();
+
         board.Disable();
 
         // Creating the custom Popup message
