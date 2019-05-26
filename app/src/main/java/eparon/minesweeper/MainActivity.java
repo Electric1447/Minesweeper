@@ -439,13 +439,7 @@ public class MainActivity extends AppCompatActivity {
         Positive.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick (View view) {
-                showADRG = !CheckBox.isChecked();
-                SharedPreferences.Editor editor = prefs.edit();
-                editor.putBoolean("showADRG", showADRG);
-                editor.apply();
-                ad.dismiss();
-                board.setState(true);
-                adRuuning = false;
+                newGameAlert2(CheckBox.isChecked());
                 Init();
             }
         });
@@ -453,15 +447,19 @@ public class MainActivity extends AppCompatActivity {
         Negative.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick (View view) {
-                showADRG = !CheckBox.isChecked();
-                SharedPreferences.Editor editor = prefs.edit();
-                editor.putBoolean("showADRG", showADRG);
-                editor.apply();
-                board.setState(true);
-                adRuuning = false;
-                ad.dismiss();
+                newGameAlert2(CheckBox.isChecked());
             }
         });
+    }
+
+    private void newGameAlert2 (boolean checked) {
+        showADRG = !checked;
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putBoolean("showADRG", showADRG);
+        editor.apply();
+        board.setState(true);
+        adRuuning = false;
+        ad.dismiss();
     }
 
     public void goSettings (View view) {
