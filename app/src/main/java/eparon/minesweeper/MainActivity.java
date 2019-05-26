@@ -207,6 +207,7 @@ public class MainActivity extends AppCompatActivity {
         TimerText[1].setText("00");
 
         if (pw != null) pw.dismiss();
+        if (ad != null) ad.dismiss();
 
         bombs = numberOfBombs;
         flags = numberOfBombs;
