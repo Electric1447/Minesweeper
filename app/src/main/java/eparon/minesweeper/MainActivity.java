@@ -156,7 +156,7 @@ public class MainActivity extends AppCompatActivity {
                         break;
                     case MotionEvent.ACTION_UP:
                     case MotionEvent.ACTION_CANCEL:
-                        if (showADRG && board.getState() && !adRuuning && !win)
+                        if (showADRG && board.getState() && !adRuuning && !win && gameTurn != 0)
                             newGameAlert();
                         else if (!adRuuning)
                             Init();
