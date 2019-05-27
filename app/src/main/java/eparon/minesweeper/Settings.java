@@ -42,11 +42,11 @@ public class Settings extends AppCompatActivity implements AdapterView.OnItemSel
     PopupWindow ad;
 
     @Override
-    public void onBackPressed() { Save(); }
+    public void onBackPressed () { Save(); }
 
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate (Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
 
@@ -84,12 +84,12 @@ public class Settings extends AppCompatActivity implements AdapterView.OnItemSel
     }
 
     @Override
-    public void onItemSelected(AdapterView<?> adapterView, View view, int position, long l) {
+    public void onItemSelected (AdapterView<?> adapterView, View view, int position, long l) {
         difficulty = Difficulty.positionToValue(position);
     }
 
     @Override
-    public void onNothingSelected(AdapterView<?> adapterView) { }
+    public void onNothingSelected (AdapterView<?> adapterView) { }
 
     public void setLongpress (View view) {
         longpressCB.setChecked(!longpressCB.isChecked());

@@ -10,8 +10,8 @@
         android:id="@+id/image"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:background="@null"
         android:adjustViewBounds="true"
+        android:background="@null"
         android:scaleType="fitXY"
         android:src="@drawable/cell_empty" />
 

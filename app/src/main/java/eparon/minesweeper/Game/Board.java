@@ -7,7 +7,7 @@ public class Board {
     private final int cols;
     private boolean state = true;
 
-    public Board(int r, int c) {
+    public Board (int r, int c) {
 
         this.rows = r;
         this.cols = c;
@@ -19,7 +19,7 @@ public class Board {
                 this.cell[i][j] = new Cell();
     }
 
-    public Cell getCell(int r, int c) {
+    public Cell getCell (int r, int c) {
         return this.cell[r][c];
     }
 

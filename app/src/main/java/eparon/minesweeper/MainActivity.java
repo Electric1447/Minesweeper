@@ -97,6 +97,8 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed () {
+        if (adRuuning)
+            newGameAlert3();
     }
 
     @Override
@@ -457,6 +459,10 @@ public class MainActivity extends AppCompatActivity {
         SharedPreferences.Editor editor = prefs.edit();
         editor.putBoolean("showADRG", showADRG);
         editor.apply();
+        newGameAlert3();
+    }
+
+    private void newGameAlert3 () {
         board.setState(true);
         adRuuning = false;
         ad.dismiss();
