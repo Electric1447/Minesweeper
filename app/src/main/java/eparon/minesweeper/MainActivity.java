@@ -43,18 +43,19 @@ public class MainActivity extends AppCompatActivity {
     public String PREFS_OVH = "OVHPrefsFile";
     SharedPreferences prefs;
 
-    int gameTurn;
-    int firstCell;
+    int gameTurn, firstCell;
+    boolean win, flag = false;
 
-    int rows = 18;
-    int cols = 12;
     Board board;
+    int rows = 18, cols = 12;
     int numberOfBombs;
     int bombs, flags;
-    boolean flag = false;
     double difficulty = Difficulty.HARD;
-    boolean win, adRuuning = false, longpress = true, vibration = true, showADRG = true;
+
+    boolean longpress = true, vibration = true, showADRG = true;
     int[] bestTime = new int[4];
+
+    boolean adRuuning = false;
 
     GridLayout gridLayout;
     Spec[] row, col;
@@ -67,6 +68,12 @@ public class MainActivity extends AppCompatActivity {
     int[] imagesResID = new int[]{R.drawable.bomb, R.drawable.cell_empty, R.drawable.cell_1,
             R.drawable.cell_2, R.drawable.cell_3, R.drawable.cell_4, R.drawable.cell_5,
             R.drawable.cell_6, R.drawable.cell_7, R.drawable.cell_8};
+    Drawable cuaDrawable, flagDrawable, flag2Drawable, bombDrawable, smileyDrawable, smiley2Drawable, smiley3Drawable;
+
+    TextView BombsCounter;
+    ImageView smiley;
+
+    PopupWindow pw, ad;
 
     TextView[] TimerText = new TextView[2];
     long startTime = 0;
@@ -88,13 +95,6 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
-    TextView BombsCounter;
-    ImageView smiley;
-
-    Drawable cuaDrawable, flagDrawable, flag2Drawable, bombDrawable, smileyDrawable, smiley2Drawable, smiley3Drawable;
-
-    PopupWindow pw, ad;
-
     @Override
     public void onBackPressed () {
         if (adRuuning)
@@ -114,7 +114,6 @@ public class MainActivity extends AppCompatActivity {
         longpress = prefs.getBoolean("longpress", longpress);
         vibration = prefs.getBoolean("vibration", vibration);
         showADRG = prefs.getBoolean("showADRG", showADRG);
-
         for (int i = 0; i < bestTime.length; i++)
             bestTime[i] = prefs.getInt("bestTime" + i, bestTime[i]);
 
@@ -190,7 +189,6 @@ public class MainActivity extends AppCompatActivity {
         for (int i = 0; i < cols; i++)
             col[i] = GridLayout.spec(i);
 
-
         gridLayout = findViewById(R.id.gl);
         gridLayout.setColumnCount(col.length);
         gridLayout.setRowCount(row.length);
@@ -200,7 +198,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void Init () {
 
-        deleteCache(this);
+        deleteCache(getApplicationContext());
 
         gameTurn = 0;
         win = false;

@@ -121,7 +121,7 @@ public class Settings extends AppCompatActivity implements AdapterView.OnItemSel
         int abh = 0;
         TypedValue tv = new TypedValue();
         if (getTheme().resolveAttribute(android.R.attr.actionBarSize, tv, true))
-            abh = TypedValue.complexToDimensionPixelSize(tv.data,getResources().getDisplayMetrics());
+            abh = TypedValue.complexToDimensionPixelSize(tv.data, getResources().getDisplayMetrics());
 
         if (showADOOB && (size.x / cols) > ((size.y - abh) / rows)) {
             if (ad != null) ad.dismiss();
@@ -131,7 +131,7 @@ public class Settings extends AppCompatActivity implements AdapterView.OnItemSel
 
             ad = new PopupWindow(customView, ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
             ad.setElevation(5.0f);
-            ad.showAtLocation(findViewById(R.id.cl), Gravity.CENTER,0,0);
+            ad.showAtLocation(findViewById(R.id.cl), Gravity.CENTER, 0, 0);
 
             TextView Title = customView.findViewById(R.id.title);
             TextView Message = customView.findViewById(R.id.message);
@@ -146,7 +146,7 @@ public class Settings extends AppCompatActivity implements AdapterView.OnItemSel
 
             Positive.setOnClickListener(new View.OnClickListener() {
                 @Override
-                public void onClick(View view) {
+                public void onClick (View view) {
                     showADOOB = !CheckBox.isChecked();
                     SharedPreferences.Editor editor = prefs.edit();
                     editor.putBoolean("showADOOB", showADOOB);
@@ -158,7 +158,7 @@ public class Settings extends AppCompatActivity implements AdapterView.OnItemSel
 
             Negative.setOnClickListener(new View.OnClickListener() {
                 @Override
-                public void onClick(View view) {
+                public void onClick (View view) {
                     showADOOB = !CheckBox.isChecked();
                     SharedPreferences.Editor editor = prefs.edit();
                     editor.putBoolean("showADOOB", showADOOB);
@@ -172,12 +172,12 @@ public class Settings extends AppCompatActivity implements AdapterView.OnItemSel
     }
 
     private void Save2 () {
-        if (rows > 24 || rows < 9)
+        if (rows > 24 || rows < 9) {
             Toast.makeText(this, "Rows number should be between 9 to 24", Toast.LENGTH_LONG).show();
-        else {
-            if (cols > 16 || cols < 6)
+        } else {
+            if (cols > 16 || cols < 6) {
                 Toast.makeText(this, "Cols number should be between 6 to 16", Toast.LENGTH_LONG).show();
-            else {
+            } else {
                 SharedPreferences.Editor editor = prefs.edit();
                 editor.putInt("rows", rows);
                 editor.putInt("cols", cols);
