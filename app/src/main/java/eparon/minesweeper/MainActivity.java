@@ -160,13 +160,13 @@ public class MainActivity extends AppCompatActivity {
                         if (showADRG && board.getState() && !adRuuning && !win && gameTurn != 0)
                             newGameAlert();
                         else if (!adRuuning)
-                            Init();
+                            Init(false);
                         new Handler().postDelayed(new Runnable() {
                             @Override
                             public void run () {
                                 smiley.setImageDrawable(smileyDrawable);
                             }
-                        }, 40);
+                        }, 50);
                         break;
                 }
                 return true;
@@ -193,10 +193,10 @@ public class MainActivity extends AppCompatActivity {
         gridLayout.setColumnCount(col.length);
         gridLayout.setRowCount(row.length);
 
-        Init();
+        Init(true);
     }
 
-    private void Init () {
+    private void Init (boolean onAppStart) {
 
         deleteCache(getApplicationContext());
 
@@ -219,18 +219,20 @@ public class MainActivity extends AppCompatActivity {
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < cols; j++) {
 
-                View v = View.inflate(this, R.layout.cell, null);
-                fl[i][j] = v.findViewById(R.id.fl);
-                ib[i][j] = v.findViewById(R.id.image);
+                if (onAppStart) {
+                    View v = View.inflate(this, R.layout.cell, null);
+                    fl[i][j] = v.findViewById(R.id.fl);
+                    ib[i][j] = v.findViewById(R.id.image);
 
-                if (fl[i][j].getParent() != null)
-                    ((ViewGroup)fl[i][j].getParent()).removeView(fl[i][j]);
+                    if (fl[i][j].getParent() != null)
+                        ((ViewGroup)fl[i][j].getParent()).removeView(fl[i][j]);
 
-                LayoutParams lp = new LayoutParams(row[i], col[j]);
-                lp.width = slotWidth;
-                lp.height = slotHeight;
-                fl[i][j].setLayoutParams(lp);
-                gridLayout.addView(fl[i][j], lp);
+                    LayoutParams lp = new LayoutParams(row[i], col[j]);
+                    lp.width = slotWidth;
+                    lp.height = slotHeight;
+                    fl[i][j].setLayoutParams(lp);
+                    gridLayout.addView(fl[i][j], lp);
+                }
 
                 ib[i][j].setImageDrawable(cuaDrawable);
 
@@ -440,7 +442,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick (View view) {
                 newGameAlert2(CheckBox.isChecked());
-                Init();
+                Init(false);
             }
         });
 
