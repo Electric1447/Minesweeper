@@ -110,6 +110,7 @@
 
         </RelativeLayout>
 
+        <!-- Main GridLayout which contains the game's board. -->
         <GridLayout
             android:id="@+id/gl"
             android:layout_width="wrap_content"

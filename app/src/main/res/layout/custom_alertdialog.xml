@@ -2,7 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/rl_custom_layout"
-    android:layout_width="@dimen/alertdialog_width"
+    android:layout_width="@dimen/alertDialog_width"
     android:layout_height="wrap_content"
     android:background="@drawable/rounded_corners"
     android:backgroundTint="@color/colorPrimaryDarkest"
@@ -13,7 +13,7 @@
 
     <TextView
         android:id="@+id/title"
-        android:layout_width="@dimen/alertdialog_width"
+        android:layout_width="@dimen/alertDialog_width"
         android:layout_height="wrap_content"
         android:paddingLeft="15dp"
         android:paddingBottom="12dp"
@@ -22,14 +22,14 @@
         android:textStyle="bold" />
 
     <View
-        android:layout_width="@dimen/alertdialog_width"
+        android:layout_width="@dimen/alertDialog_width"
         android:layout_height="1.2dp"
         android:layout_below="@id/title"
         android:background="@color/colorAccent" />
 
     <TextView
         android:id="@+id/message"
-        android:layout_width="@dimen/alertdialog_width"
+        android:layout_width="@dimen/alertDialog_width"
         android:layout_height="wrap_content"
         android:layout_below="@id/title"
         android:padding="12dp"
@@ -38,7 +38,7 @@
 
     <CheckBox
         android:id="@+id/cb"
-        android:layout_width="@dimen/alertdialog_width"
+        android:layout_width="@dimen/alertDialog_width"
         android:layout_height="wrap_content"
         android:layout_below="@id/message"
         android:layout_marginLeft="10dp"
@@ -50,7 +50,7 @@
 
     <LinearLayout
         android:id="@+id/buttons"
-        android:layout_width="@dimen/alertdialog_width"
+        android:layout_width="@dimen/alertDialog_width"
         android:layout_height="wrap_content"
         android:layout_below="@id/cb"
         android:layout_centerHorizontal="true"

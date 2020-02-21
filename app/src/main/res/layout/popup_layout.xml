@@ -74,7 +74,7 @@
             android:fontFamily="@font/rusq"
             android:gravity="right"
             android:paddingRight="5dp"
-            android:text="@string/besttime_msg"
+            android:text="@string/bestTime_msg"
             android:textColor="#FF0000"
             android:textSize="21sp" />
 

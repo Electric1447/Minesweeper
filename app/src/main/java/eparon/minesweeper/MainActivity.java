@@ -1,9 +1,7 @@
 package eparon.minesweeper;
 
 import android.annotation.SuppressLint;
-import android.content.Context;
-import android.content.Intent;
-import android.content.SharedPreferences;
+import android.content.*;
 import android.graphics.Point;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
@@ -38,7 +36,7 @@ import eparon.minesweeper.Game.Difficulty;
 @SuppressLint({"ClickableViewAccessibility", "SetTextI18n"})
 public class MainActivity extends AppCompatActivity {
 
-    public String PREFS_OVH = "OVHPrefsFile";
+    public String PREFS_FMS = "FMSPrefsFile";
     SharedPreferences prefs;
 
     int gameTurn, firstCell;
@@ -53,11 +51,11 @@ public class MainActivity extends AppCompatActivity {
     boolean longpress = true, vibration = true, showADRG = true;
     int[] bestTime = new int[4];
 
-    boolean adRuuning = false;
+    boolean adRunning = false;
 
     GridLayout gridLayout;
     Spec[] row, col;
-    int slotWidth, slotHeight;
+    int slotDimensions;
 
     FrameLayout[][] fl;
     ImageButton[][] ib;
@@ -76,7 +74,7 @@ public class MainActivity extends AppCompatActivity {
     TextView[] TimerText = new TextView[2];
     long startTime = 0;
 
-    //runs without a timer by reposting this handler at the end of the runnable
+    //region Timer
     Handler timerHandler = new Handler();
     Runnable timerRunnable = new Runnable() {
         @Override
@@ -92,10 +90,11 @@ public class MainActivity extends AppCompatActivity {
             timerHandler.postDelayed(this, 500);
         }
     };
+    //endregion
 
     @Override
     public void onBackPressed () {
-        if (adRuuning)
+        if (adRunning)
             newGameAlert3();
     }
 
@@ -104,7 +103,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        prefs = getSharedPreferences(PREFS_OVH, Context.MODE_PRIVATE);
+        prefs = getSharedPreferences(PREFS_FMS, Context.MODE_PRIVATE);
 
         rows = prefs.getInt("rows", rows);
         cols = prefs.getInt("cols", cols);
@@ -155,9 +154,9 @@ public class MainActivity extends AppCompatActivity {
                         break;
                     case MotionEvent.ACTION_UP:
                     case MotionEvent.ACTION_CANCEL:
-                        if (showADRG && board.getState() && !adRuuning && !win && gameTurn != 0)
+                        if (showADRG && board.getState() && !adRunning && !win && gameTurn != 0)
                             newGameAlert();
-                        else if (!adRuuning)
+                        else if (!adRunning)
                             Init(false);
                         new Handler().postDelayed(new Runnable() {
                             @Override
@@ -176,10 +175,7 @@ public class MainActivity extends AppCompatActivity {
         getWindowManager().getDefaultDisplay().getSize(size);
         final float scale = getApplicationContext().getResources().getDisplayMetrics().density;
         int pixels = (int)(scale + 0.5f);
-        double screenWidth = size.x - pixels;
-        double screenHeight = screenWidth / cols * rows;
-        slotWidth = (int)(screenWidth / cols);
-        slotHeight = (int)(screenHeight / rows);
+        slotDimensions = (size.x - pixels) / cols;
 
         // Initializing the GridLayout;
         for (int i = 0; i < rows; i++)
@@ -224,8 +220,8 @@ public class MainActivity extends AppCompatActivity {
                         ((ViewGroup)fl[i][j].getParent()).removeView(fl[i][j]);
 
                     LayoutParams lp = new LayoutParams(row[i], col[j]);
-                    lp.width = slotWidth;
-                    lp.height = slotHeight;
+                    lp.width = slotDimensions;
+                    lp.height = slotDimensions;
                     fl[i][j].setLayoutParams(lp);
                     gridLayout.addView(fl[i][j], lp);
                 }
@@ -410,9 +406,14 @@ public class MainActivity extends AppCompatActivity {
         else view.setBackground(bombDrawable);
     }
 
+    /**
+     * This function is the function that displays the new game alert.
+     *
+     * It has 2 helper functions - 'newGameAlert2' & 'newGameAlert3'.
+     */
     private void newGameAlert () {
         if (ad != null) ad.dismiss();
-        adRuuning = true;
+        adRunning = true;
         board.setState(false);
 
         // Creating the custom AlertDialog
@@ -450,6 +451,11 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * This function is the helper function of 'newGameAlert'.
+     *
+     * @param checked "don't show this message again" checkbox value
+     */
     private void newGameAlert2 (boolean checked) {
         showADRG = !checked;
         SharedPreferences.Editor editor = prefs.edit();
@@ -458,9 +464,12 @@ public class MainActivity extends AppCompatActivity {
         newGameAlert3();
     }
 
+    /**
+     * This function is the helper function of 'newGameAlert' & 'newGameAlert2'.
+     */
     private void newGameAlert3 () {
         board.setState(true);
-        adRuuning = false;
+        adRunning = false;
         ad.dismiss();
     }
 

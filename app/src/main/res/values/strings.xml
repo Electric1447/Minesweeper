@@ -4,7 +4,7 @@
 
     <string name="win_msg">You Win!</string>
     <string name="time_msg">Time:</string>
-    <string name="besttime_msg">Best Time:</string>
+    <string name="bestTime_msg">Best Time:</string>
 
 
     <string name="ad_rg_title">Start New Game?</string>

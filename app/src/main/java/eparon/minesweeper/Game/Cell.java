@@ -6,6 +6,9 @@ public class Cell {
     private boolean clicked;
     private boolean flagged;
 
+    /**
+     * Constructor for class Cell
+     */
     public Cell () {
         this.value = 0;
         this.clicked = false;
@@ -36,16 +39,27 @@ public class Cell {
         this.flagged = f;
     }
 
+    /**
+     * This method returns if this cell is a bomb.
+     *
+     * @return boolean This returns if this cell is a bomb.
+     */
     public boolean isBomb () {
         return this.value == -1;
     }
 
+    /**
+     * This function resets this cell's state.
+     */
     public void resetState () {
         this.value = 0;
         this.clicked = false;
         this.flagged = false;
     }
 
+    /**
+     * This function add 1 to the value of this cell.
+     */
     public void plusplus () {
         this.value++;
     }

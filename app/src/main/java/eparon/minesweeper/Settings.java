@@ -8,7 +8,6 @@ import android.graphics.Point;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.TypedValue;
-import android.view.Display;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,7 +26,7 @@ import eparon.minesweeper.Game.Difficulty;
 @SuppressLint("SetTextI18n")
 public class Settings extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
-    public String PREFS_OVH = "OVHPrefsFile";
+    public String PREFS_FMS = "FMSPrefsFile";
     SharedPreferences prefs;
 
     int rows = 18, cols = 12;
@@ -42,15 +41,16 @@ public class Settings extends AppCompatActivity implements AdapterView.OnItemSel
     PopupWindow ad;
 
     @Override
-    public void onBackPressed () { Save(); }
-
+    public void onBackPressed () {
+        Save();
+    }
 
     @Override
     protected void onCreate (Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
 
-        prefs = getSharedPreferences(PREFS_OVH, Context.MODE_PRIVATE);
+        prefs = getSharedPreferences(PREFS_FMS, Context.MODE_PRIVATE);
 
         rows = prefs.getInt("rows", rows);
         cols = prefs.getInt("cols", cols);
@@ -89,7 +89,8 @@ public class Settings extends AppCompatActivity implements AdapterView.OnItemSel
     }
 
     @Override
-    public void onNothingSelected (AdapterView<?> adapterView) { }
+    public void onNothingSelected (AdapterView<?> adapterView) {
+    }
 
     public void setLongpress (View view) {
         longpressCB.setChecked(!longpressCB.isChecked());
@@ -106,8 +107,15 @@ public class Settings extends AppCompatActivity implements AdapterView.OnItemSel
         showADRG = adrgCB.isChecked();
     }
 
-    public void goBack (View view) { Save(); }
+    public void goBack (View view) {
+        Save();
+    }
 
+    /**
+     * This method is the main save method.
+     * <p>
+     * It also calls the a helper method - 'Save2'.
+     */
     private void Save () {
         if (Rows.getText().toString().equals("")) Rows.setText(String.valueOf(rows));
         if (Cols.getText().toString().equals("")) Cols.setText(String.valueOf(cols));
@@ -115,13 +123,11 @@ public class Settings extends AppCompatActivity implements AdapterView.OnItemSel
         rows = Integer.valueOf(Rows.getText().toString());
         cols = Integer.valueOf(Cols.getText().toString());
 
-        Display display = getWindowManager().getDefaultDisplay();
         Point size = new Point();
-        display.getSize(size);
+        getWindowManager().getDefaultDisplay().getSize(size);
         int abh = 0;
         TypedValue tv = new TypedValue();
-        if (getTheme().resolveAttribute(android.R.attr.actionBarSize, tv, true))
-            abh = TypedValue.complexToDimensionPixelSize(tv.data, getResources().getDisplayMetrics());
+        if (getTheme().resolveAttribute(android.R.attr.actionBarSize, tv, true)) abh = TypedValue.complexToDimensionPixelSize(tv.data, getResources().getDisplayMetrics());
 
         if (showADOOB && (size.x / cols) > ((size.y - abh) / rows)) {
             if (ad != null) ad.dismiss();
@@ -144,6 +150,7 @@ public class Settings extends AppCompatActivity implements AdapterView.OnItemSel
             Positive.setText(R.string.ad_oob_positive);
             Negative.setText(R.string.ad_oob_negative);
 
+            // OK function.
             Positive.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick (View view) {
@@ -156,6 +163,7 @@ public class Settings extends AppCompatActivity implements AdapterView.OnItemSel
                 }
             });
 
+            // Cancel function.
             Negative.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick (View view) {
@@ -171,6 +179,11 @@ public class Settings extends AppCompatActivity implements AdapterView.OnItemSel
         }
     }
 
+    /**
+     * This method is the helper save method.
+     * <p>
+     * It is called by the main save method - 'Save'.
+     */
     private void Save2 () {
         if (rows > 24 || rows < 9) {
             Toast.makeText(this, "Rows number should be between 9 to 24", Toast.LENGTH_LONG).show();

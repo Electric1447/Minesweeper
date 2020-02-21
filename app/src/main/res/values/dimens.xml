@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <dimen name="popup_window_width">310dp</dimen>
-    <dimen name="alertdialog_width">320dp</dimen>
+    <dimen name="alertDialog_width" >320dp</dimen>
 </resources>
