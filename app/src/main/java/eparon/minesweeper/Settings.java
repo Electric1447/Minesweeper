@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Point;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
@@ -19,6 +18,8 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AppCompatActivity;
+
 import java.util.Locale;
 
 import eparon.minesweeper.Game.Difficulty;
@@ -26,7 +27,7 @@ import eparon.minesweeper.Game.Difficulty;
 @SuppressLint("SetTextI18n")
 public class Settings extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
-    public String PREFS_FMS = "FMSPrefsFile";
+    public String PREFS_MS = "MSPrefsFile";
     SharedPreferences prefs;
 
     int rows = 18, cols = 12;
@@ -50,7 +51,7 @@ public class Settings extends AppCompatActivity implements AdapterView.OnItemSel
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
 
-        prefs = getSharedPreferences(PREFS_FMS, Context.MODE_PRIVATE);
+        prefs = getSharedPreferences(PREFS_MS, Context.MODE_PRIVATE);
 
         rows = prefs.getInt("rows", rows);
         cols = prefs.getInt("cols", cols);
@@ -120,8 +121,8 @@ public class Settings extends AppCompatActivity implements AdapterView.OnItemSel
         if (Rows.getText().toString().equals("")) Rows.setText(String.valueOf(rows));
         if (Cols.getText().toString().equals("")) Cols.setText(String.valueOf(cols));
 
-        rows = Integer.valueOf(Rows.getText().toString());
-        cols = Integer.valueOf(Cols.getText().toString());
+        rows = Integer.parseInt(Rows.getText().toString());
+        cols = Integer.parseInt(Cols.getText().toString());
 
         Point size = new Point();
         getWindowManager().getDefaultDisplay().getSize(size);
@@ -151,28 +152,22 @@ public class Settings extends AppCompatActivity implements AdapterView.OnItemSel
             Negative.setText(R.string.ad_oob_negative);
 
             // OK function.
-            Positive.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick (View view) {
-                    showADOOB = !CheckBox.isChecked();
-                    SharedPreferences.Editor editor = prefs.edit();
-                    editor.putBoolean("showADOOB", showADOOB);
-                    editor.apply();
-                    ad.dismiss();
-                    Save2();
-                }
+            Positive.setOnClickListener(view -> {
+                showADOOB = !CheckBox.isChecked();
+                SharedPreferences.Editor editor = prefs.edit();
+                editor.putBoolean("showADOOB", showADOOB);
+                editor.apply();
+                ad.dismiss();
+                Save2();
             });
 
             // Cancel function.
-            Negative.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick (View view) {
-                    showADOOB = !CheckBox.isChecked();
-                    SharedPreferences.Editor editor = prefs.edit();
-                    editor.putBoolean("showADOOB", showADOOB);
-                    editor.apply();
-                    ad.dismiss();
-                }
+            Negative.setOnClickListener(view -> {
+                showADOOB = !CheckBox.isChecked();
+                SharedPreferences.Editor editor = prefs.edit();
+                editor.putBoolean("showADOOB", showADOOB);
+                editor.apply();
+                ad.dismiss();
             });
         } else {
             Save2();

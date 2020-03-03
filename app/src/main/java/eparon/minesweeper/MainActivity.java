@@ -1,7 +1,9 @@
 package eparon.minesweeper;
 
 import android.annotation.SuppressLint;
-import android.content.*;
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Point;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
@@ -9,12 +11,9 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
-import android.support.v7.app.AppCompatActivity;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.View.OnLongClickListener;
-import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.FrameLayout;
@@ -26,6 +25,8 @@ import android.widget.ImageView;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 
+import androidx.appcompat.app.AppCompatActivity;
+
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Random;
@@ -36,7 +37,7 @@ import eparon.minesweeper.Game.Difficulty;
 @SuppressLint({"ClickableViewAccessibility", "SetTextI18n"})
 public class MainActivity extends AppCompatActivity {
 
-    public String PREFS_FMS = "FMSPrefsFile";
+    public String PREFS_MS = "MSPrefsFile";
     SharedPreferences prefs;
 
     int gameTurn, firstCell;
@@ -44,8 +45,7 @@ public class MainActivity extends AppCompatActivity {
 
     Board board;
     int rows = 18, cols = 12;
-    int numberOfBombs;
-    int bombs, flags;
+    int numberOfBombs, bombs, flags;
     double difficulty = Difficulty.HARD;
 
     boolean longpress = true, vibration = true, showADRG = true;
@@ -103,7 +103,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        prefs = getSharedPreferences(PREFS_FMS, Context.MODE_PRIVATE);
+        prefs = getSharedPreferences(PREFS_MS, Context.MODE_PRIVATE);
 
         rows = prefs.getInt("rows", rows);
         cols = prefs.getInt("cols", cols);
@@ -145,29 +145,21 @@ public class MainActivity extends AppCompatActivity {
 
         smiley = findViewById(R.id.smiley);
         smiley.setImageDrawable(smileyDrawable);
-        smiley.setOnTouchListener(new OnTouchListener() {
-            @Override
-            public boolean onTouch (View v, MotionEvent event) {
-                switch (event.getAction()) {
-                    case MotionEvent.ACTION_DOWN:
-                        smiley.setImageDrawable(smiley3Drawable);
-                        break;
-                    case MotionEvent.ACTION_UP:
-                    case MotionEvent.ACTION_CANCEL:
-                        if (showADRG && board.getState() && !adRunning && !win && gameTurn != 0)
-                            newGameAlert();
-                        else if (!adRunning)
-                            Init(false);
-                        new Handler().postDelayed(new Runnable() {
-                            @Override
-                            public void run () {
-                                smiley.setImageDrawable(smileyDrawable);
-                            }
-                        }, 50);
-                        break;
-                }
-                return true;
+        smiley.setOnTouchListener((v, event) -> {
+            switch (event.getAction()) {
+                case MotionEvent.ACTION_DOWN:
+                    smiley.setImageDrawable(smiley3Drawable);
+                    break;
+                case MotionEvent.ACTION_UP:
+                case MotionEvent.ACTION_CANCEL:
+                    if (showADRG && board.getState() && !adRunning && !win && gameTurn != 0)
+                        newGameAlert();
+                    else if (!adRunning)
+                        Init(false);
+                    new Handler().postDelayed(() -> smiley.setImageDrawable(smileyDrawable), 50);
+                    break;
             }
+            return true;
         });
 
         // Getting the Screen Size and converting it into the Slots Prams;
@@ -229,24 +221,17 @@ public class MainActivity extends AppCompatActivity {
                 ib[i][j].setImageDrawable(cuaDrawable);
 
                 final int finalI = i, finalJ = j;
-                ib[i][j].setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick (View view) {
-                        clickCell(finalI, finalJ, flag);
-                    }
-                });
+                ib[i][j].setOnClickListener(view -> clickCell(finalI, finalJ, flag));
+
                 if (longpress) {
-                    ib[i][j].setOnLongClickListener(new OnLongClickListener() {
-                        @Override
-                        public boolean onLongClick (View v) {
-                            if (vibration && !board.getCell(finalI, finalJ).isClicked() && board.getState())
-                                if (Build.VERSION.SDK_INT >= 26)
-                                    ((Vibrator)Objects.requireNonNull(getSystemService(VIBRATOR_SERVICE))).vibrate(VibrationEffect.createOneShot(100, VibrationEffect.DEFAULT_AMPLITUDE));
-                                else
-                                    ((Vibrator)Objects.requireNonNull(getSystemService(VIBRATOR_SERVICE))).vibrate(100);
-                            clickCell(finalI, finalJ, !flag);
-                            return true;
-                        }
+                    ib[i][j].setOnLongClickListener(v -> {
+                        if (vibration && !board.getCell(finalI, finalJ).isClicked() && board.getState())
+                            if (Build.VERSION.SDK_INT >= 26)
+                                ((Vibrator)Objects.requireNonNull(getSystemService(VIBRATOR_SERVICE))).vibrate(VibrationEffect.createOneShot(100, VibrationEffect.DEFAULT_AMPLITUDE));
+                            else
+                                ((Vibrator)Objects.requireNonNull(getSystemService(VIBRATOR_SERVICE))).vibrate(100);
+                        clickCell(finalI, finalJ, !flag);
+                        return true;
                     });
                 }
             }
@@ -347,12 +332,14 @@ public class MainActivity extends AppCompatActivity {
 
         int time = Integer.parseInt(TimerText[0].getText().toString()) * 60 + Integer.parseInt(TimerText[1].getText().toString());
         int pos = Difficulty.valueToPosition(difficulty);
+
         if (time < bestTime[pos] || bestTime[pos] == 0) {
             bestTime[pos] = time;
             SharedPreferences.Editor editor = prefs.edit();
             editor.putInt("bestTime" + pos, bestTime[pos]);
             editor.apply();
         }
+
         TextView TimeMsg = customView.findViewById(R.id.timeMsg);
         TextView BestTimeMsg = customView.findViewById(R.id.besttimeMsg);
         TimeMsg.setText(String.format("%s:%s", TimerText[0].getText().toString(), TimerText[1].getText().toString()));
@@ -408,7 +395,7 @@ public class MainActivity extends AppCompatActivity {
 
     /**
      * This function is the function that displays the new game alert.
-     *
+     * <p>
      * It has 2 helper functions - 'newGameAlert2' & 'newGameAlert3'.
      */
     private void newGameAlert () {
@@ -435,20 +422,12 @@ public class MainActivity extends AppCompatActivity {
         Positive.setText(R.string.ad_rg_positive);
         Negative.setText(R.string.ad_rg_negative);
 
-        Positive.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick (View view) {
-                newGameAlert2(CheckBox.isChecked());
-                Init(false);
-            }
+        Positive.setOnClickListener(view -> {
+            newGameAlert2(CheckBox.isChecked());
+            Init(false);
         });
 
-        Negative.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick (View view) {
-                newGameAlert2(CheckBox.isChecked());
-            }
-        });
+        Negative.setOnClickListener(view -> newGameAlert2(CheckBox.isChecked()));
     }
 
     /**
