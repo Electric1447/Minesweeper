@@ -59,7 +59,7 @@
     </LinearLayout>
 
     <LinearLayout
-        android:id="@+id/besttimeLayout"
+        android:id="@+id/bestTimeLayout"
         android:layout_width="@dimen/popup_window_width"
         android:layout_height="wrap_content"
         android:layout_below="@id/timeLayout"
@@ -79,7 +79,7 @@
             android:textSize="21sp" />
 
         <TextView
-            android:id="@+id/besttimeMsg"
+            android:id="@+id/bestTimeMsg"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"

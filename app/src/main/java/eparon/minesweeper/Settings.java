@@ -34,7 +34,7 @@ public class Settings extends AppCompatActivity implements AdapterView.OnItemSel
     TextView Rows, Cols;
 
     double difficulty = Difficulty.HARD;
-    Spinner difSpinner;
+    Spinner diffSpinner;
 
     boolean longpress = true, vibration = true, showADRG = true, showADOOB = true;
     CheckBox longpressCB, vibrationCB, adrgCB;
@@ -66,12 +66,12 @@ public class Settings extends AppCompatActivity implements AdapterView.OnItemSel
         Rows.setHint(String.format(Locale.getDefault(), "%02d", rows));
         Cols.setHint(String.format(Locale.getDefault(), "%02d", cols));
 
-        difSpinner = findViewById(R.id.dif_spinner);
+        diffSpinner = findViewById(R.id.dif_spinner);
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this, R.array.difficulty_array, android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        difSpinner.setAdapter(adapter);
-        difSpinner.setOnItemSelectedListener(this);
-        difSpinner.setSelection(Difficulty.valueToPosition(difficulty));
+        diffSpinner.setAdapter(adapter);
+        diffSpinner.setOnItemSelectedListener(this);
+        diffSpinner.setSelection(Difficulty.valueToPosition(difficulty));
 
         longpressCB = findViewById(R.id.cbLongpress);
         longpressCB.setChecked(longpress);
@@ -118,11 +118,8 @@ public class Settings extends AppCompatActivity implements AdapterView.OnItemSel
      * It also calls the a helper method - 'Save2'.
      */
     private void Save () {
-        if (Rows.getText().toString().equals("")) Rows.setText(String.valueOf(rows));
-        if (Cols.getText().toString().equals("")) Cols.setText(String.valueOf(cols));
-
-        rows = Integer.parseInt(Rows.getText().toString());
-        cols = Integer.parseInt(Cols.getText().toString());
+        if (!Rows.getText().toString().equals("")) rows = Integer.parseInt(Rows.getText().toString());
+        if (!Cols.getText().toString().equals("")) cols = Integer.parseInt(Cols.getText().toString());
 
         Point size = new Point();
         getWindowManager().getDefaultDisplay().getSize(size);
@@ -140,38 +137,34 @@ public class Settings extends AppCompatActivity implements AdapterView.OnItemSel
             ad.setElevation(5.0f);
             ad.showAtLocation(findViewById(R.id.cl), Gravity.CENTER, 0, 0);
 
-            TextView Title = customView.findViewById(R.id.title);
-            TextView Message = customView.findViewById(R.id.message);
-            TextView Positive = customView.findViewById(R.id.positive);
-            TextView Negative = customView.findViewById(R.id.negative);
-            final CheckBox CheckBox = customView.findViewById(R.id.cb);
+            ((TextView)customView.findViewById(R.id.title)).setText(R.string.ad_oob_title); // Title
+            ((TextView)customView.findViewById(R.id.message)).setText(R.string.ad_oob_message); // Message
+            TextView Positive = customView.findViewById(R.id.positive); // Positive button
+            TextView Negative = customView.findViewById(R.id.negative); // Negative button
+            final CheckBox CheckBox = customView.findViewById(R.id.cb); // Checkbox
 
-            Title.setText(R.string.ad_oob_title);
-            Message.setText(R.string.ad_oob_message);
             Positive.setText(R.string.ad_oob_positive);
             Negative.setText(R.string.ad_oob_negative);
 
             // OK function.
             Positive.setOnClickListener(view -> {
-                showADOOB = !CheckBox.isChecked();
-                SharedPreferences.Editor editor = prefs.edit();
-                editor.putBoolean("showADOOB", showADOOB);
-                editor.apply();
-                ad.dismiss();
+                ADOOB2(CheckBox.isChecked());
                 Save2();
             });
 
             // Cancel function.
-            Negative.setOnClickListener(view -> {
-                showADOOB = !CheckBox.isChecked();
-                SharedPreferences.Editor editor = prefs.edit();
-                editor.putBoolean("showADOOB", showADOOB);
-                editor.apply();
-                ad.dismiss();
-            });
+            Negative.setOnClickListener(view -> ADOOB2(CheckBox.isChecked()));
         } else {
             Save2();
         }
+    }
+
+    private void ADOOB2 (boolean checked) {
+        SharedPreferences.Editor editor = prefs.edit();
+        showADOOB = !checked;
+        editor.putBoolean("showADOOB", showADOOB);
+        editor.apply();
+        ad.dismiss();
     }
 
     /**
@@ -182,20 +175,18 @@ public class Settings extends AppCompatActivity implements AdapterView.OnItemSel
     private void Save2 () {
         if (rows > 24 || rows < 9) {
             Toast.makeText(this, "Rows number should be between 9 to 24", Toast.LENGTH_LONG).show();
+        } else if (cols > 16 || cols < 6) {
+            Toast.makeText(this, "Cols number should be between 6 to 16", Toast.LENGTH_LONG).show();
         } else {
-            if (cols > 16 || cols < 6) {
-                Toast.makeText(this, "Cols number should be between 6 to 16", Toast.LENGTH_LONG).show();
-            } else {
-                SharedPreferences.Editor editor = prefs.edit();
-                editor.putInt("rows", rows);
-                editor.putInt("cols", cols);
-                editor.putString("difficulty", String.valueOf(difficulty));
-                editor.putBoolean("longpress", longpress);
-                editor.putBoolean("vibration", vibration);
-                editor.putBoolean("showADRG", showADRG);
-                editor.apply();
-                startActivity(new Intent(Settings.this, MainActivity.class));
-            }
+            SharedPreferences.Editor editor = prefs.edit();
+            editor.putInt("rows", rows);
+            editor.putInt("cols", cols);
+            editor.putString("difficulty", String.valueOf(difficulty));
+            editor.putBoolean("longpress", longpress);
+            editor.putBoolean("vibration", vibration);
+            editor.putBoolean("showADRG", showADRG);
+            editor.apply();
+            startActivity(new Intent(Settings.this, MainActivity.class));
         }
     }
 

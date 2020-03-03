@@ -18,8 +18,6 @@ import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.FrameLayout;
 import android.widget.GridLayout;
-import android.widget.GridLayout.LayoutParams;
-import android.widget.GridLayout.Spec;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.PopupWindow;
@@ -54,7 +52,6 @@ public class MainActivity extends AppCompatActivity {
     boolean adRunning = false;
 
     GridLayout gridLayout;
-    Spec[] row, col;
     int slotDimensions;
 
     FrameLayout[][] fl;
@@ -117,22 +114,10 @@ public class MainActivity extends AppCompatActivity {
         board = new Board(rows, cols);
         numberOfBombs = (int)((rows * cols) / difficulty);
 
-        row = new Spec[rows];
-        col = new Spec[cols];
-
         fl = new FrameLayout[rows][cols];
         ib = new ImageButton[rows][cols];
 
-        cuaDrawable = initializeDrawable(R.drawable.cell_unassigned);
-        flagDrawable = initializeDrawable(R.drawable.flag);
-        flag2Drawable = initializeDrawable(R.drawable.flag2);
-        bombDrawable = initializeDrawable(R.drawable.bomb2);
-        smileyDrawable = initializeDrawable(R.drawable.smiley);
-        smiley2Drawable = initializeDrawable(R.drawable.smiley2);
-        smiley3Drawable = initializeDrawable(R.drawable.smiley3);
-
-        for (int i = 0; i < images.length; i++)
-            images[i] = initializeDrawable(imagesResID[i]);
+        initializeDrawables();
 
         TimerText[0] = findViewById(R.id.timer1);
         TimerText[1] = findViewById(R.id.timer2);
@@ -166,18 +151,11 @@ public class MainActivity extends AppCompatActivity {
         Point size = new Point();
         getWindowManager().getDefaultDisplay().getSize(size);
         final float scale = getApplicationContext().getResources().getDisplayMetrics().density;
-        int pixels = (int)(scale + 0.5f);
-        slotDimensions = (size.x - pixels) / cols;
-
-        // Initializing the GridLayout;
-        for (int i = 0; i < rows; i++)
-            row[i] = GridLayout.spec(i);
-        for (int i = 0; i < cols; i++)
-            col[i] = GridLayout.spec(i);
+        slotDimensions = (size.x - (int)(scale + 0.5f)) / cols;
 
         gridLayout = findViewById(R.id.gl);
-        gridLayout.setColumnCount(col.length);
-        gridLayout.setRowCount(row.length);
+        gridLayout.setColumnCount(cols);
+        gridLayout.setRowCount(rows);
 
         Init(true);
     }
@@ -208,13 +186,11 @@ public class MainActivity extends AppCompatActivity {
                     fl[i][j] = v.findViewById(R.id.fl);
                     ib[i][j] = v.findViewById(R.id.image);
 
-                    if (fl[i][j].getParent() != null)
-                        ((ViewGroup)fl[i][j].getParent()).removeView(fl[i][j]);
+                    if (fl[i][j].getParent() != null) ((ViewGroup)fl[i][j].getParent()).removeView(fl[i][j]);
 
-                    LayoutParams lp = new LayoutParams(row[i], col[j]);
+                    GridLayout.LayoutParams lp = new GridLayout.LayoutParams();
                     lp.width = slotDimensions;
                     lp.height = slotDimensions;
-                    fl[i][j].setLayoutParams(lp);
                     gridLayout.addView(fl[i][j], lp);
                 }
 
@@ -267,7 +243,6 @@ public class MainActivity extends AppCompatActivity {
 
 
     private void revealCell (int rowPos, int colPos, boolean putFlag) {
-
         // If it hasn't been clicked yet.
         if (!board.getCell(rowPos, colPos).isClicked()) {
             if (putFlag) {
@@ -275,15 +250,15 @@ public class MainActivity extends AppCompatActivity {
                     if (flags > 0) {
                         ib[rowPos][colPos].setImageDrawable(flagDrawable);
                         flags--;
-                    } else {
                         board.getCell(rowPos, colPos).setFlagged(!board.getCell(rowPos, colPos).isFlagged());
                     }
                 } else {
                     ib[rowPos][colPos].setImageDrawable(cuaDrawable);
                     flags++;
+                    board.getCell(rowPos, colPos).setFlagged(!board.getCell(rowPos, colPos).isFlagged());
                 }
                 BombsCounter.setText(String.format(Locale.getDefault(), "%02d", flags));
-                board.getCell(rowPos, colPos).setFlagged(!board.getCell(rowPos, colPos).isFlagged());
+
             } else if (!board.getCell(rowPos, colPos).isFlagged()) {
 
                 board.getCell(rowPos, colPos).setClicked(true);
@@ -295,10 +270,8 @@ public class MainActivity extends AppCompatActivity {
                         timerHandler.removeCallbacks(timerRunnable);
                         for (int i = 0; i < rows; i++)
                             for (int j = 0; j < cols; j++)
-                                if (!board.getCell(i, j).isFlagged())
-                                    ib[i][j].setImageDrawable(images[board.getCell(i, j).getValue() + 1]);
-                                else if (board.getCell(i, j).getValue() != -1)
-                                    ib[i][j].setImageDrawable(flag2Drawable);
+                                if (!board.getCell(i, j).isFlagged())          ib[i][j].setImageDrawable(images[board.getCell(i, j).getValue() + 1]);
+                                else if (board.getCell(i, j).getValue() != -1) ib[i][j].setImageDrawable(flag2Drawable);
                         board.setState(false);
                         break;
                     case 0:
@@ -312,8 +285,7 @@ public class MainActivity extends AppCompatActivity {
 
                 gameTurn++;
 
-                if (gameTurn == rows * cols - numberOfBombs)
-                    winGame();
+                if (gameTurn == rows * cols - numberOfBombs) winGame();
             }
         }
     }
@@ -341,7 +313,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         TextView TimeMsg = customView.findViewById(R.id.timeMsg);
-        TextView BestTimeMsg = customView.findViewById(R.id.besttimeMsg);
+        TextView BestTimeMsg = customView.findViewById(R.id.bestTimeMsg);
         TimeMsg.setText(String.format("%s:%s", TimerText[0].getText().toString(), TimerText[1].getText().toString()));
         BestTimeMsg.setText(String.format(Locale.getDefault(), "%02d:%02d", bestTime[pos] / 60, bestTime[pos] % 60));
 
@@ -387,10 +359,23 @@ public class MainActivity extends AppCompatActivity {
         return d;
     }
 
+    private void initializeDrawables () {
+        cuaDrawable = initializeDrawable(R.drawable.cell_unassigned);
+        flagDrawable = initializeDrawable(R.drawable.flag);
+        flag2Drawable = initializeDrawable(R.drawable.flag2);
+        bombDrawable = initializeDrawable(R.drawable.bomb2);
+        smileyDrawable = initializeDrawable(R.drawable.smiley);
+        smiley2Drawable = initializeDrawable(R.drawable.smiley2);
+        smiley3Drawable = initializeDrawable(R.drawable.smiley3);
+
+        for (int i = 0; i < images.length; i++)
+            images[i] = initializeDrawable(imagesResID[i]);
+    }
+
     public void flagSwitch (View view) {
         flag = !flag;
         if (flag) view.setBackground(flagDrawable);
-        else view.setBackground(bombDrawable);
+        else      view.setBackground(bombDrawable);
     }
 
     /**
