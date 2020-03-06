@@ -30,6 +30,7 @@ import java.util.Objects;
 import java.util.Random;
 
 import eparon.minesweeper.Game.Board;
+import eparon.minesweeper.Game.Cell;
 import eparon.minesweeper.Game.Difficulty;
 
 @SuppressLint({"ClickableViewAccessibility", "SetTextI18n"})
@@ -38,7 +39,7 @@ public class MainActivity extends AppCompatActivity {
     public String PREFS_MS = "MSPrefsFile";
     SharedPreferences prefs;
 
-    int gameTurn, firstCell;
+    int gameTurn;
     boolean win, flag = false;
 
     Board board;
@@ -49,8 +50,6 @@ public class MainActivity extends AppCompatActivity {
     boolean longpress = true, vibration = true, showADRG = true;
     int[] bestTime = new int[4];
 
-    boolean adRunning = false;
-
     GridLayout gridLayout;
     int slotDimensions;
 
@@ -58,15 +57,15 @@ public class MainActivity extends AppCompatActivity {
     ImageButton[][] ib;
 
     Drawable[] images = new Drawable[10];
-    int[] imagesResID = new int[]{R.drawable.bomb, R.drawable.cell_empty, R.drawable.cell_1,
-            R.drawable.cell_2, R.drawable.cell_3, R.drawable.cell_4, R.drawable.cell_5,
-            R.drawable.cell_6, R.drawable.cell_7, R.drawable.cell_8};
+    int[] imagesResID = new int[]{R.drawable.bomb, R.drawable.cell_empty, R.drawable.cell_1, R.drawable.cell_2, R.drawable.cell_3,
+            R.drawable.cell_4, R.drawable.cell_5, R.drawable.cell_6, R.drawable.cell_7, R.drawable.cell_8};
     Drawable cuaDrawable, flagDrawable, flag2Drawable, bombDrawable, smileyDrawable, smiley2Drawable, smiley3Drawable;
 
     TextView BombsCounter;
     ImageView smiley;
 
     PopupWindow pw, ad;
+    boolean adRunning = false;
 
     TextView[] TimerText = new TextView[2];
     long startTime = 0;
@@ -77,12 +76,9 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void run () {
             long millis = System.currentTimeMillis() - startTime;
-            int seconds = (int)(millis / 1000);
-            int minutes = seconds / 60;
-            seconds %= 60;
 
-            TimerText[0].setText(String.format(Locale.getDefault(), "%02d", minutes));
-            TimerText[1].setText(String.format(Locale.getDefault(), "%02d", seconds));
+            TimerText[0].setText(String.format(Locale.getDefault(), "%02d", (int)(millis / 60000))); // Minutes
+            TimerText[1].setText(String.format(Locale.getDefault(), "%02d", (int)(millis / 1000) % 60)); // Seconds
 
             timerHandler.postDelayed(this, 500);
         }
@@ -122,10 +118,9 @@ public class MainActivity extends AppCompatActivity {
         TimerText[1] = findViewById(R.id.timer2);
         BombsCounter = findViewById(R.id.bombsCounter);
 
+        findViewById(R.id.switchPointer).setBackground(bombDrawable);
         findViewById(R.id.timerll).setBackground(initializeDrawable(R.drawable.timer_background));
         BombsCounter.setBackground(initializeDrawable(R.drawable.bombs_counter_background));
-
-        findViewById(R.id.switchPointer).setBackground(bombDrawable);
 
         smiley = findViewById(R.id.smiley);
         smiley.setImageDrawable(smileyDrawable);
@@ -146,7 +141,7 @@ public class MainActivity extends AppCompatActivity {
             return true;
         });
 
-        // Getting the Screen Size and converting it into the Slots Prams;
+        // Getting the Screen Size and converting it into the Slots Dimensions;
         Point size = new Point();
         getWindowManager().getDefaultDisplay().getSize(size);
         final float scale = getApplicationContext().getResources().getDisplayMetrics().density;
@@ -160,19 +155,16 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void Init (boolean onAppStart) {
+        if (pw != null) pw.dismiss();
 
         gameTurn = 0;
         win = false;
+        bombs = numberOfBombs;
+        flags = numberOfBombs;
 
         timerHandler.removeCallbacks(timerRunnable);
         TimerText[0].setText("00");
         TimerText[1].setText("00");
-
-        if (pw != null) pw.dismiss();
-
-        bombs = numberOfBombs;
-        flags = numberOfBombs;
-
         BombsCounter.setText(String.format(Locale.getDefault(), "%02d", flags));
 
         board.resetState();
@@ -198,17 +190,14 @@ public class MainActivity extends AppCompatActivity {
                 final int finalI = i, finalJ = j;
                 ib[i][j].setOnClickListener(view -> clickCell(finalI, finalJ, flag));
 
-                if (longpress) {
-                    ib[i][j].setOnLongClickListener(v -> {
-                        if (vibration && !board.getCell(finalI, finalJ).isClicked() && board.getState())
-                            if (Build.VERSION.SDK_INT >= 26)
-                                ((Vibrator)Objects.requireNonNull(getSystemService(VIBRATOR_SERVICE))).vibrate(VibrationEffect.createOneShot(100, VibrationEffect.DEFAULT_AMPLITUDE));
-                            else
-                                ((Vibrator)Objects.requireNonNull(getSystemService(VIBRATOR_SERVICE))).vibrate(100);
-                        clickCell(finalI, finalJ, !flag);
-                        return true;
-                    });
-                }
+                if (longpress) ib[i][j].setOnLongClickListener(v -> {
+                    Vibrator vibrator = (Vibrator)Objects.requireNonNull(getSystemService(VIBRATOR_SERVICE));
+                    if (vibration && !board.getCell(finalI, finalJ).isRevealed() && board.getState())
+                        if (Build.VERSION.SDK_INT >= 26) vibrator.vibrate(VibrationEffect.createOneShot(100, VibrationEffect.DEFAULT_AMPLITUDE));
+                        else                             vibrator.vibrate(100);
+                    clickCell(finalI, finalJ, !flag);
+                    return true;
+                });
             }
         }
 
@@ -218,14 +207,13 @@ public class MainActivity extends AppCompatActivity {
         gridLayout.setLayoutParams(lp);
     }
 
-    private void startBoardGeneration () {
+    private void startBoardGeneration (int firstCell) {
 
         Random r = new Random();
         int counter = 0;
 
         while (bombs != 0) {
-            if (counter >= cols * rows)
-                counter = 0;
+            if (counter >= cols * rows) counter = 0;
 
             if (r.nextDouble() < 0.10 && !board.getCell(counter / cols, counter % cols).isBomb()
                     && counter != firstCell - 1 - cols && counter != firstCell - cols && counter != firstCell + 1 - cols
@@ -240,50 +228,50 @@ public class MainActivity extends AppCompatActivity {
         board.detectBombs();
     }
 
-
     private void revealCell (int rowPos, int colPos, boolean putFlag) {
+        Cell currentCell = board.getCell(rowPos, colPos);
+
         // If it hasn't been clicked yet.
-        if (!board.getCell(rowPos, colPos).isClicked()) {
+        if (!currentCell.isRevealed()) {
+
             if (putFlag) {
-                if (!board.getCell(rowPos, colPos).isFlagged()) {
+                if (!currentCell.isFlagged()) {
                     if (flags > 0) {
                         ib[rowPos][colPos].setImageDrawable(flagDrawable);
                         flags--;
-                        board.getCell(rowPos, colPos).setFlagged(!board.getCell(rowPos, colPos).isFlagged());
+                        currentCell.setFlagged(!currentCell.isFlagged());
                     }
                 } else {
                     ib[rowPos][colPos].setImageDrawable(cuaDrawable);
                     flags++;
-                    board.getCell(rowPos, colPos).setFlagged(!board.getCell(rowPos, colPos).isFlagged());
+                    currentCell.setFlagged(!currentCell.isFlagged());
                 }
                 BombsCounter.setText(String.format(Locale.getDefault(), "%02d", flags));
 
-            } else if (!board.getCell(rowPos, colPos).isFlagged()) {
+            } else if (!currentCell.isFlagged()) {
+                currentCell.setRevealed(true);
 
-                board.getCell(rowPos, colPos).setClicked(true);
-
-                switch (board.getCell(rowPos, colPos).getValue()) {
-                    case -1:
+                switch (currentCell.getValue()) {
+                    case -1: // Bomb
                         gameTurn = 0;
                         smiley.setImageDrawable(smiley2Drawable);
                         timerHandler.removeCallbacks(timerRunnable);
                         for (int i = 0; i < rows; i++)
                             for (int j = 0; j < cols; j++)
-                                if (!board.getCell(i, j).isFlagged())          ib[i][j].setImageDrawable(images[board.getCell(i, j).getValue() + 1]);
-                                else if (board.getCell(i, j).getValue() != -1) ib[i][j].setImageDrawable(flag2Drawable);
+                                if (!board.getCell(i, j).isFlagged())   ib[i][j].setImageDrawable(images[board.getCell(i, j).getValue() + 1]);
+                                else if (!board.getCell(i, j).isBomb()) ib[i][j].setImageDrawable(flag2Drawable);
                         board.setState(false);
                         break;
-                    case 0:
-                        ib[rowPos][colPos].setImageDrawable(images[board.getCell(rowPos, colPos).getValue() + 1]);
+                    case 0: // 0
+                        ib[rowPos][colPos].setImageDrawable(images[currentCell.getValue() + 1]);
                         revealSurroundingCells(rowPos, colPos);
                         break;
                     default:
-                        ib[rowPos][colPos].setImageDrawable(images[board.getCell(rowPos, colPos).getValue() + 1]);
+                        ib[rowPos][colPos].setImageDrawable(images[currentCell.getValue() + 1]);
                         break;
                 }
 
                 gameTurn++;
-
                 if (gameTurn == rows * cols - numberOfBombs) winGame();
             }
         }
@@ -293,7 +281,7 @@ public class MainActivity extends AppCompatActivity {
         win = true;
         board.setState(false);
 
-        // Creating the custom Popup message
+        // Creating the custom Popup message.
         View customView = View.inflate(this, R.layout.popup_layout, null);
 
         pw = new PopupWindow(customView, ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
@@ -311,25 +299,22 @@ public class MainActivity extends AppCompatActivity {
             editor.apply();
         }
 
-        TextView TimeMsg = customView.findViewById(R.id.timeMsg);
-        TextView BestTimeMsg = customView.findViewById(R.id.bestTimeMsg);
-        TimeMsg.setText(String.format("%s:%s", TimerText[0].getText().toString(), TimerText[1].getText().toString()));
-        BestTimeMsg.setText(String.format(Locale.getDefault(), "%02d:%02d", bestTime[pos] / 60, bestTime[pos] % 60));
+        ((TextView)customView.findViewById(R.id.timeMsg)).setText(String.format("%s:%s", TimerText[0].getText().toString(), TimerText[1].getText().toString()));
+        ((TextView)customView.findViewById(R.id.bestTimeMsg)).setText(String.format(Locale.getDefault(), "%02d:%02d", bestTime[pos] / 60, bestTime[pos] % 60));
 
         timerHandler.removeCallbacks(timerRunnable);
     }
 
     private void clickCell (final int r, final int c, boolean clickType) {
         if (board.getState()) {
-            if (board.getCell(r, c).isClicked()) {
+            if (board.getCell(r, c).isRevealed()) {
                 if (board.countSurroundingFlags(r, c) >= board.getCell(r, c).getValue())
                     revealSurroundingCells(r, c);
             } else {
                 if (gameTurn == 0 && !clickType) {
                     startTime = System.currentTimeMillis();
                     timerHandler.postDelayed(timerRunnable, 0);
-                    firstCell = r * cols + c;
-                    startBoardGeneration();
+                    startBoardGeneration(r * cols + c);
                 }
                 revealCell(r, c, clickType);
             }
@@ -337,18 +322,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void revealSurroundingCells (final int r, final int c) {
-        RSC2(r - 1, c - 1); // Top Left
-        RSC2(r - 1, c    ); // Top
-        RSC2(r - 1, c + 1); // Top Right
-        RSC2(r    , c - 1); // Left
-        RSC2(r    , c + 1); // Right
-        RSC2(r + 1, c - 1); // Bottom Left
-        RSC2(r + 1, c    ); // Bottom
-        RSC2(r + 1, c + 1); // Bottom Right
-    }
-
-    private void RSC2 (final int r, final int c) {
-        if (board.inbounds(r, c)) revealCell(r, c, false);
+        for (int i = 0; i < 8; i++)
+            if (board.inbounds(r + Board.neighboursLoop[i][0], c + Board.neighboursLoop[i][1]))
+                revealCell(r + Board.neighboursLoop[i][0], c + Board.neighboursLoop[i][1], false);
     }
 
     private Drawable initializeDrawable (int resID) {
@@ -367,8 +343,7 @@ public class MainActivity extends AppCompatActivity {
         smiley2Drawable = initializeDrawable(R.drawable.smiley2);
         smiley3Drawable = initializeDrawable(R.drawable.smiley3);
 
-        for (int i = 0; i < images.length; i++)
-            images[i] = initializeDrawable(imagesResID[i]);
+        for (int i = 0; i < images.length; i++) images[i] = initializeDrawable(imagesResID[i]);
     }
 
     public void flagSwitch (View view) {
@@ -395,14 +370,12 @@ public class MainActivity extends AppCompatActivity {
         ad.setAnimationStyle(R.style.PopupWindowAnimation);
         ad.showAtLocation(findViewById(R.id.cl), Gravity.CENTER, 0, 0);
 
-        TextView Title = customView.findViewById(R.id.title);
-        TextView Message = customView.findViewById(R.id.message);
+        ((TextView)customView.findViewById(R.id.title)).setText(R.string.ad_rg_title);
+        ((TextView)customView.findViewById(R.id.message)).setText(R.string.ad_rg_message);
         TextView Positive = customView.findViewById(R.id.positive);
         TextView Negative = customView.findViewById(R.id.negative);
         final CheckBox CheckBox = customView.findViewById(R.id.cb);
 
-        Title.setText(R.string.ad_rg_title);
-        Message.setText(R.string.ad_rg_message);
         Positive.setText(R.string.ad_rg_positive);
         Negative.setText(R.string.ad_rg_negative);
 

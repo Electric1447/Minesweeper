@@ -105,7 +105,7 @@
                 android:paddingRight="20dp">
 
                 <TextView
-                    android:id="@+id/dif_text"
+                    android:id="@+id/diff_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentLeft="true"
@@ -116,13 +116,13 @@
                     android:textSize="20sp" />
 
                 <Spinner
-                    android:id="@+id/dif_spinner"
+                    android:id="@+id/diff_spinner"
                     style="?attr/spinnerDropDownItemStyle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_centerVertical="true"
                     android:layout_marginLeft="8dp"
-                    android:layout_toRightOf="@id/dif_text"
+                    android:layout_toRightOf="@id/diff_text"
                     android:entries="@array/difficulty_array" />
 
             </RelativeLayout>

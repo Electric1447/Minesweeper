@@ -6,6 +6,8 @@
     <string name="time_msg">Time:</string>
     <string name="bestTime_msg">Best Time:</string>
 
+    <string name="err_invalid_rows">Rows number should be between 9 to 24</string>
+    <string name="err_invalid_cols">Cols number should be between 6 to 16</string>
 
     <string name="ad_rg_title">Start New Game?</string>
     <string name="ad_rg_message">This will reset your current progress.</string>

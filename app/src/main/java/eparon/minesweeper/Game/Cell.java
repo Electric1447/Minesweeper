@@ -3,7 +3,7 @@ package eparon.minesweeper.Game;
 public class Cell {
 
     private int value;
-    private boolean clicked;
+    private boolean revealed;
     private boolean flagged;
 
     /**
@@ -11,7 +11,7 @@ public class Cell {
      */
     public Cell () {
         this.value = 0;
-        this.clicked = false;
+        this.revealed = false;
         this.flagged = false;
     }
 
@@ -19,8 +19,8 @@ public class Cell {
         return this.value;
     }
 
-    public boolean isClicked () {
-        return this.clicked;
+    public boolean isRevealed () {
+        return this.revealed;
     }
 
     public boolean isFlagged () {
@@ -31,8 +31,8 @@ public class Cell {
         this.value = v;
     }
 
-    public void setClicked (boolean c) {
-        this.clicked = c;
+    public void setRevealed (boolean c) {
+        this.revealed = c;
     }
 
     public void setFlagged (boolean f) {
@@ -53,7 +53,7 @@ public class Cell {
      */
     public void resetState () {
         this.value = 0;
-        this.clicked = false;
+        this.revealed = false;
         this.flagged = false;
     }
 

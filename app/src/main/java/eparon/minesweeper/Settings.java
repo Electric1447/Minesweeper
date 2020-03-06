@@ -66,7 +66,7 @@ public class Settings extends AppCompatActivity implements AdapterView.OnItemSel
         Rows.setHint(String.format(Locale.getDefault(), "%02d", rows));
         Cols.setHint(String.format(Locale.getDefault(), "%02d", cols));
 
-        diffSpinner = findViewById(R.id.dif_spinner);
+        diffSpinner = findViewById(R.id.diff_spinner);
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this, R.array.difficulty_array, android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         diffSpinner.setAdapter(adapter);
@@ -80,8 +80,7 @@ public class Settings extends AppCompatActivity implements AdapterView.OnItemSel
         adrgCB = findViewById(R.id.cbADRG);
         adrgCB.setChecked(showADRG);
 
-        TextView version = findViewById(R.id.ver);
-        version.setText(String.format("Version %s\nCreated by Itai Levin.", BuildConfig.VERSION_NAME));
+        ((TextView)findViewById(R.id.ver)).setText(String.format("Version %s\nCreated by Itai Levin.", BuildConfig.VERSION_NAME)); // Set version TextView;
     }
 
     @Override
@@ -174,9 +173,9 @@ public class Settings extends AppCompatActivity implements AdapterView.OnItemSel
      */
     private void Save2 () {
         if (rows > 24 || rows < 9) {
-            Toast.makeText(this, "Rows number should be between 9 to 24", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, R.string.err_invalid_rows, Toast.LENGTH_LONG).show();
         } else if (cols > 16 || cols < 6) {
-            Toast.makeText(this, "Cols number should be between 6 to 16", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, R.string.err_invalid_cols, Toast.LENGTH_LONG).show();
         } else {
             SharedPreferences.Editor editor = prefs.edit();
             editor.putInt("rows", rows);
