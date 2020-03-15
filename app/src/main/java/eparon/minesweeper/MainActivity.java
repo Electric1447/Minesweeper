@@ -16,7 +16,6 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
-import android.widget.FrameLayout;
 import android.widget.GridLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -27,7 +26,6 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import java.util.Locale;
 import java.util.Objects;
-import java.util.Random;
 
 import eparon.minesweeper.Game.Board;
 import eparon.minesweeper.Game.Cell;
@@ -39,38 +37,30 @@ public class MainActivity extends AppCompatActivity {
     public String PREFS_MS = "MSPrefsFile";
     SharedPreferences prefs;
 
-    int gameTurn;
-    boolean win, flag = false;
-
     Board board;
     int rows = 18, cols = 12;
-    int numberOfBombs, bombs, flags;
+    int gameTurn, numberOfBombs, flags;
+    boolean win, flag = false, longpress = true, vibration = true, showADRG = true;
     double difficulty = Difficulty.HARD;
-
-    boolean longpress = true, vibration = true, showADRG = true;
     int[] bestTime = new int[4];
+    long startTime = 0;
 
     GridLayout gridLayout;
-    int slotDimensions;
-
-    FrameLayout[][] fl;
     ImageButton[][] ib;
 
-    Drawable[] images = new Drawable[10];
-    int[] imagesResID = new int[]{R.drawable.bomb, R.drawable.cell_empty, R.drawable.cell_1, R.drawable.cell_2, R.drawable.cell_3,
-            R.drawable.cell_4, R.drawable.cell_5, R.drawable.cell_6, R.drawable.cell_7, R.drawable.cell_8};
-    Drawable cuaDrawable, flagDrawable, flag2Drawable, bombDrawable, smileyDrawable, smiley2Drawable, smiley3Drawable;
-
+    TextView[] TimerText = new TextView[2];
     TextView BombsCounter;
     ImageView smiley;
 
     PopupWindow pw, ad;
     boolean adRunning = false;
 
-    TextView[] TimerText = new TextView[2];
-    long startTime = 0;
+    Drawable[] images = new Drawable[10];
+    int[] imagesResID = new int[] {R.drawable.bomb, R.drawable.cell_empty, R.drawable.cell_1, R.drawable.cell_2, R.drawable.cell_3,
+            R.drawable.cell_4, R.drawable.cell_5, R.drawable.cell_6, R.drawable.cell_7, R.drawable.cell_8};
+    Drawable cuaDrawable, flagDrawable, flag2Drawable, bombDrawable, smileyDrawable, smiley2Drawable, smiley3Drawable;
 
-    //region Timer
+    //region Timer region
     Handler timerHandler = new Handler();
     Runnable timerRunnable = new Runnable() {
         @Override
@@ -99,17 +89,15 @@ public class MainActivity extends AppCompatActivity {
 
         rows = prefs.getInt("rows", rows);
         cols = prefs.getInt("cols", cols);
-        difficulty = Double.parseDouble(prefs.getString("difficulty", String.valueOf(difficulty)));
+        difficulty = Double.parseDouble(Objects.requireNonNull(prefs.getString("difficulty", String.valueOf(difficulty))));
         longpress = prefs.getBoolean("longpress", longpress);
         vibration = prefs.getBoolean("vibration", vibration);
         showADRG = prefs.getBoolean("showADRG", showADRG);
-        for (int i = 0; i < bestTime.length; i++)
-            bestTime[i] = prefs.getInt("bestTime" + i, bestTime[i]);
+        for (int i = 0; i < bestTime.length; i++) bestTime[i] = prefs.getInt("bestTime" + i, bestTime[i]);
 
         board = new Board(rows, cols);
         numberOfBombs = (int)((rows * cols) / difficulty);
 
-        fl = new FrameLayout[rows][cols];
         ib = new ImageButton[rows][cols];
 
         initializeDrawables();
@@ -117,9 +105,6 @@ public class MainActivity extends AppCompatActivity {
         TimerText[0] = findViewById(R.id.timer1);
         TimerText[1] = findViewById(R.id.timer2);
         BombsCounter = findViewById(R.id.bombsCounter);
-
-        findViewById(R.id.switchPointer).setBackground(bombDrawable);
-        findViewById(R.id.timerll).setBackground(initializeDrawable(R.drawable.timer_background));
         BombsCounter.setBackground(initializeDrawable(R.drawable.bombs_counter_background));
 
         smiley = findViewById(R.id.smiley);
@@ -134,32 +119,25 @@ public class MainActivity extends AppCompatActivity {
                     if (showADRG && board.getState() && !adRunning && !win && gameTurn != 0)
                         newGameAlert();
                     else if (!adRunning)
-                        Init(false);
+                        Init();
                     new Handler().postDelayed(() -> smiley.setImageDrawable(smileyDrawable), 50);
                     break;
             }
             return true;
         });
 
-        // Getting the Screen Size and converting it into the Slots Dimensions;
-        Point size = new Point();
-        getWindowManager().getDefaultDisplay().getSize(size);
-        final float scale = getApplicationContext().getResources().getDisplayMetrics().density;
-        slotDimensions = (size.x - (int)(scale + 0.5f)) / cols;
-
-        gridLayout = findViewById(R.id.gl);
-        gridLayout.setColumnCount(cols);
-        gridLayout.setRowCount(rows);
-
-        Init(true);
+        Init();
+        DrawBoard();
     }
 
-    private void Init (boolean onAppStart) {
+    /**
+     * This method initializes the game.
+     */
+    private void Init () {
         if (pw != null) pw.dismiss();
 
         gameTurn = 0;
         win = false;
-        bombs = numberOfBombs;
         flags = numberOfBombs;
 
         timerHandler.removeCallbacks(timerRunnable);
@@ -169,122 +147,135 @@ public class MainActivity extends AppCompatActivity {
 
         board.resetState();
 
-        for (int i = 0; i < rows; i++) {
-            for (int j = 0; j < cols; j++) {
+        for (int r = 0; r < rows; r++)
+            for (int c = 0; c < cols; c++)
+                if (ib[r][c] != null) ib[r][c].setImageDrawable(cuaDrawable);
+    }
 
-                if (onAppStart) {
-                    View v = View.inflate(this, R.layout.cell, null);
-                    fl[i][j] = v.findViewById(R.id.fl);
-                    ib[i][j] = v.findViewById(R.id.image);
+    /**
+     * This method draws the board.
+     */
+    private void DrawBoard () {
+        Point size = new Point();
+        getWindowManager().getDefaultDisplay().getSize(size);
+        final float scale = getApplicationContext().getResources().getDisplayMetrics().density;
 
-                    if (fl[i][j].getParent() != null) ((ViewGroup)fl[i][j].getParent()).removeView(fl[i][j]);
+        gridLayout = findViewById(R.id.gl);
+        gridLayout.setColumnCount(cols);
+        gridLayout.setRowCount(rows);
 
-                    GridLayout.LayoutParams lp = new GridLayout.LayoutParams();
-                    lp.width = slotDimensions;
-                    lp.height = slotDimensions;
-                    gridLayout.addView(fl[i][j], lp);
-                }
+        for (int r = 0; r < rows; r++)
+            for (int c = 0; c < cols; c++) {
 
-                ib[i][j].setImageDrawable(cuaDrawable);
+                View v = View.inflate(this, R.layout.cell, null);
+                ib[r][c] = v.findViewById(R.id.ib);
 
-                final int finalI = i, finalJ = j;
-                ib[i][j].setOnClickListener(view -> clickCell(finalI, finalJ, flag));
+                GridLayout.LayoutParams lp = new GridLayout.LayoutParams();
+                lp.width = (size.x - (int)(scale + 0.5f)) / cols;
+                gridLayout.addView(ib[r][c], lp);
 
-                if (longpress) ib[i][j].setOnLongClickListener(v -> {
+                ib[r][c].setImageDrawable(cuaDrawable);
+                final int finalR = r, finalC = c;
+
+                ib[r][c].setOnClickListener(view -> clickCell(finalR, finalC, flag));
+
+                if (longpress) ib[r][c].setOnLongClickListener(view -> {
                     Vibrator vibrator = (Vibrator)Objects.requireNonNull(getSystemService(VIBRATOR_SERVICE));
-                    if (vibration && !board.getCell(finalI, finalJ).isRevealed() && board.getState())
+                    if (vibration && board.getState() && !board.getCell(finalR, finalC).isRevealed())
                         if (Build.VERSION.SDK_INT >= 26) vibrator.vibrate(VibrationEffect.createOneShot(100, VibrationEffect.DEFAULT_AMPLITUDE));
-                        else                             vibrator.vibrate(100);
-                    clickCell(finalI, finalJ, !flag);
+                        else vibrator.vibrate(100);
+                    clickCell(finalR, finalC, !flag);
                     return true;
                 });
             }
-        }
-
-        // Set the GridLayout's height the same size as it's width
-        ViewGroup.LayoutParams lp = gridLayout.getLayoutParams();
-        lp.height = lp.width;
-        gridLayout.setLayoutParams(lp);
     }
 
-    private void startBoardGeneration (int firstCell) {
+    /**
+     * This method is called when the user clicks on a cell.
+     *
+     * @param r         cell's row position
+     * @param c         cell's column position
+     * @param clickType the type of the click
+     */
+    private void clickCell (final int r, final int c, boolean clickType) {
+        if (!board.getState()) return; // If the board is disabled you cannot click a cell.
 
-        Random r = new Random();
-        int counter = 0;
-
-        while (bombs != 0) {
-            if (counter >= cols * rows) counter = 0;
-
-            if (r.nextDouble() < 0.10 && !board.getCell(counter / cols, counter % cols).isBomb()
-                    && counter != firstCell - 1 - cols && counter != firstCell - cols && counter != firstCell + 1 - cols
-                    && counter != firstCell - 1        && counter != firstCell        && counter != firstCell + 1
-                    && counter != firstCell - 1 + cols && counter != firstCell + cols && counter != firstCell + 1 + cols) {
-                board.getCell(counter / cols, counter % cols).setValue(-1);
-                bombs--;
-            }
-            counter++;
+        if (gameTurn == 0 && !clickType) { // First turn.
+            startTime = System.currentTimeMillis();
+            timerHandler.postDelayed(timerRunnable, 0);
+            board.startBoardGeneration(r * cols + c, numberOfBombs);
         }
-
-        board.detectBombs();
+        if (!board.getCell(r, c).isRevealed())
+            revealCell(r, c, clickType);
+        else if (board.countSurroundingFlags(r, c) >= board.getCell(r, c).getValue())
+            revealSurroundingCells(r, c);
     }
 
+    /**
+     * This method is called when the user wants to reveal/put flag on a cell.
+     *
+     * @param rowPos  cell's row position
+     * @param colPos  cell's column position
+     * @param putFlag the current click action (Flag/Bomb)
+     */
     private void revealCell (int rowPos, int colPos, boolean putFlag) {
         Cell currentCell = board.getCell(rowPos, colPos);
+        if (currentCell.isRevealed()) return; // If the cell has been clicked already.
 
-        // If it hasn't been clicked yet.
-        if (!currentCell.isRevealed()) {
-
-            if (putFlag) {
-                if (!currentCell.isFlagged()) {
-                    if (flags > 0) {
-                        ib[rowPos][colPos].setImageDrawable(flagDrawable);
-                        flags--;
-                        currentCell.setFlagged(!currentCell.isFlagged());
-                    }
-                } else {
-                    ib[rowPos][colPos].setImageDrawable(cuaDrawable);
-                    flags++;
-                    currentCell.setFlagged(!currentCell.isFlagged());
-                }
-                BombsCounter.setText(String.format(Locale.getDefault(), "%02d", flags));
-
-            } else if (!currentCell.isFlagged()) {
-                currentCell.setRevealed(true);
-
-                switch (currentCell.getValue()) {
-                    case -1: // Bomb
-                        gameTurn = 0;
-                        smiley.setImageDrawable(smiley2Drawable);
-                        timerHandler.removeCallbacks(timerRunnable);
-                        for (int i = 0; i < rows; i++)
-                            for (int j = 0; j < cols; j++)
-                                if (!board.getCell(i, j).isFlagged())   ib[i][j].setImageDrawable(images[board.getCell(i, j).getValue() + 1]);
-                                else if (!board.getCell(i, j).isBomb()) ib[i][j].setImageDrawable(flag2Drawable);
-                        board.setState(false);
-                        break;
-                    case 0: // 0
-                        ib[rowPos][colPos].setImageDrawable(images[currentCell.getValue() + 1]);
-                        revealSurroundingCells(rowPos, colPos);
-                        break;
-                    default:
-                        ib[rowPos][colPos].setImageDrawable(images[currentCell.getValue() + 1]);
-                        break;
-                }
-
-                gameTurn++;
-                if (gameTurn == rows * cols - numberOfBombs) winGame();
+        if (putFlag) { // If the user wants to put a flag on the cell.
+            if (currentCell.isFlagged()) {
+                ib[rowPos][colPos].setImageDrawable(cuaDrawable);
+                flags++;
+                currentCell.setFlagged(!currentCell.isFlagged());
+            } else if (flags > 0) {
+                ib[rowPos][colPos].setImageDrawable(flagDrawable);
+                flags--;
+                currentCell.setFlagged(!currentCell.isFlagged());
             }
+            BombsCounter.setText(String.format(Locale.getDefault(), "%02d", flags));
+        } else if (!currentCell.isFlagged()) { // If the user wants to put a bomb on the cell.
+            currentCell.setRevealed(true); // Reveal the cell;
+
+            if (currentCell.isBomb()) { // User clicked on a bomb -> Lost the game.
+                smiley.setImageDrawable(smiley2Drawable);
+                timerHandler.removeCallbacks(timerRunnable);
+                for (int r = 0; r < rows; r++)
+                    for (int c = 0; c < cols; c++)
+                        if (!board.getCell(r, c).isFlagged()) ib[r][c].setImageDrawable(images[board.getCell(r, c).getValue() + 1]);
+                        else if (!board.getCell(r, c).isBomb()) ib[r][c].setImageDrawable(flag2Drawable);
+                board.setState(false);
+            } else {
+                ib[rowPos][colPos].setImageDrawable(images[currentCell.getValue() + 1]);
+                if (currentCell.getValue() == 0) revealSurroundingCells(rowPos, colPos);
+            }
+
+            gameTurn++;
+            if (gameTurn == rows * cols - numberOfBombs && board.getState()) winGame(); // Win check.
         }
     }
 
+    /**
+     * This method calls the function 'revealCell' on all of the surrounding cells of the given cell.
+     *
+     * @param r cell's row position
+     * @param c cell's column position
+     */
+    private void revealSurroundingCells (final int r, final int c) {
+        for (int i = 0; i < 8; i++)
+            if (board.inbounds(r + Board.neighboursLoop[i][0], c + Board.neighboursLoop[i][1]))
+                revealCell(r + Board.neighboursLoop[i][0], c + Board.neighboursLoop[i][1], false);
+    }
+
+    /**
+     * This method is called when the user wins the game.
+     */
     private void winGame () {
         win = true;
         board.setState(false);
 
         // Creating the custom Popup message.
-        View customView = View.inflate(this, R.layout.popup_layout, null);
-
-        pw = new PopupWindow(customView, ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        View wgView = View.inflate(this, R.layout.popup_layout, null);
+        pw = new PopupWindow(wgView, ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         pw.setElevation(5.0f);
         pw.setAnimationStyle(R.style.PopupWindowAnimation);
         pw.showAtLocation(findViewById(R.id.cl), Gravity.CENTER, 0, 0);
@@ -299,34 +290,84 @@ public class MainActivity extends AppCompatActivity {
             editor.apply();
         }
 
-        ((TextView)customView.findViewById(R.id.timeMsg)).setText(String.format("%s:%s", TimerText[0].getText().toString(), TimerText[1].getText().toString()));
-        ((TextView)customView.findViewById(R.id.bestTimeMsg)).setText(String.format(Locale.getDefault(), "%02d:%02d", bestTime[pos] / 60, bestTime[pos] % 60));
+        ((TextView)wgView.findViewById(R.id.timeMsg)).setText(String.format("%s:%s", TimerText[0].getText().toString(), TimerText[1].getText().toString()));
+        ((TextView)wgView.findViewById(R.id.bestTimeMsg)).setText(String.format(Locale.getDefault(), "%02d:%02d", bestTime[pos] / 60, bestTime[pos] % 60));
 
         timerHandler.removeCallbacks(timerRunnable);
     }
 
-    private void clickCell (final int r, final int c, boolean clickType) {
-        if (board.getState()) {
-            if (board.getCell(r, c).isRevealed()) {
-                if (board.countSurroundingFlags(r, c) >= board.getCell(r, c).getValue())
-                    revealSurroundingCells(r, c);
-            } else {
-                if (gameTurn == 0 && !clickType) {
-                    startTime = System.currentTimeMillis();
-                    timerHandler.postDelayed(timerRunnable, 0);
-                    startBoardGeneration(r * cols + c);
-                }
-                revealCell(r, c, clickType);
-            }
-        }
+    //region newGameAlert functions region
+
+    /**
+     * This method is the function that displays the new game alert.
+     * <p>
+     * It has 2 helper functions - 'newGameAlert2' & 'newGameAlert3'.
+     */
+    private void newGameAlert () {
+        if (ad != null) ad.dismiss();
+        adRunning = true;
+        board.setState(false);
+
+        // Creating the custom AlertDialog
+        View ngaView = View.inflate(this, R.layout.custom_alertdialog, null);
+        ad = new PopupWindow(ngaView, ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        ad.setElevation(5.0f);
+        ad.setAnimationStyle(R.style.PopupWindowAnimation);
+        ad.showAtLocation(findViewById(R.id.cl), Gravity.CENTER, 0, 0);
+
+        ((TextView)ngaView.findViewById(R.id.title)).setText(R.string.ad_rg_title);
+        ((TextView)ngaView.findViewById(R.id.message)).setText(R.string.ad_rg_message);
+        TextView Positive = ngaView.findViewById(R.id.positive);
+        TextView Negative = ngaView.findViewById(R.id.negative);
+        final CheckBox CheckBox = ngaView.findViewById(R.id.cb);
+
+        Positive.setText(R.string.ad_rg_positive);
+        Negative.setText(R.string.ad_rg_negative);
+
+        Positive.setOnClickListener(view -> newGameAlert2(CheckBox.isChecked(), true));
+        Negative.setOnClickListener(view -> newGameAlert2(CheckBox.isChecked(), false));
     }
 
-    private void revealSurroundingCells (final int r, final int c) {
-        for (int i = 0; i < 8; i++)
-            if (board.inbounds(r + Board.neighboursLoop[i][0], c + Board.neighboursLoop[i][1]))
-                revealCell(r + Board.neighboursLoop[i][0], c + Board.neighboursLoop[i][1], false);
+    /**
+     * This method is the helper method of 'newGameAlert'.
+     *
+     * @param checked "don't show this message again" checkbox value
+     */
+    private void newGameAlert2 (boolean checked, boolean result) {
+        showADRG = !checked;
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putBoolean("showADRG", showADRG);
+        editor.apply();
+        newGameAlert3();
+        if (result) Init();
     }
 
+    /**
+     * This method is the helper method of 'newGameAlert' & 'newGameAlert2'.
+     */
+    private void newGameAlert3 () {
+        board.setState(true);
+        adRunning = false;
+        ad.dismiss();
+    }
+    //endregion
+
+    /**
+     * This method switches the current click action. (Flag/Bomb), it is called by the button in the titlebar.
+     */
+    public void flagSwitch (View view) {
+        flag = !flag;
+        view.setBackground(flag ? flagDrawable : bombDrawable);
+    }
+
+    //region Drawable region
+
+    /**
+     * This function returns a drawable without the bilinear filter that Android gives images by default.
+     *
+     * @param resID the drawable's resource id
+     * @return Drawable; This returns the drawable without the bilinear filter.
+     */
     private Drawable initializeDrawable (int resID) {
         Drawable d = getDrawable(resID);
         assert d != null;
@@ -334,6 +375,9 @@ public class MainActivity extends AppCompatActivity {
         return d;
     }
 
+    /**
+     * This method initializes all drawables.
+     */
     private void initializeDrawables () {
         cuaDrawable = initializeDrawable(R.drawable.cell_unassigned);
         flagDrawable = initializeDrawable(R.drawable.flag);
@@ -344,71 +388,15 @@ public class MainActivity extends AppCompatActivity {
         smiley3Drawable = initializeDrawable(R.drawable.smiley3);
 
         for (int i = 0; i < images.length; i++) images[i] = initializeDrawable(imagesResID[i]);
-    }
 
-    public void flagSwitch (View view) {
-        flag = !flag;
-        if (flag) view.setBackground(flagDrawable);
-        else      view.setBackground(bombDrawable);
+        findViewById(R.id.switchPointer).setBackground(bombDrawable);
+        findViewById(R.id.timerll).setBackground(initializeDrawable(R.drawable.timer_background));
     }
+    //endregion
 
     /**
-     * This function is the function that displays the new game alert.
-     * <p>
-     * It has 2 helper functions - 'newGameAlert2' & 'newGameAlert3'.
+     * This function opens the Settings activity.
      */
-    private void newGameAlert () {
-        if (ad != null) ad.dismiss();
-        adRunning = true;
-        board.setState(false);
-
-        // Creating the custom AlertDialog
-        View customView = View.inflate(this, R.layout.custom_alertdialog, null);
-
-        ad = new PopupWindow(customView, ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        ad.setElevation(5.0f);
-        ad.setAnimationStyle(R.style.PopupWindowAnimation);
-        ad.showAtLocation(findViewById(R.id.cl), Gravity.CENTER, 0, 0);
-
-        ((TextView)customView.findViewById(R.id.title)).setText(R.string.ad_rg_title);
-        ((TextView)customView.findViewById(R.id.message)).setText(R.string.ad_rg_message);
-        TextView Positive = customView.findViewById(R.id.positive);
-        TextView Negative = customView.findViewById(R.id.negative);
-        final CheckBox CheckBox = customView.findViewById(R.id.cb);
-
-        Positive.setText(R.string.ad_rg_positive);
-        Negative.setText(R.string.ad_rg_negative);
-
-        Positive.setOnClickListener(view -> {
-            newGameAlert2(CheckBox.isChecked());
-            Init(false);
-        });
-
-        Negative.setOnClickListener(view -> newGameAlert2(CheckBox.isChecked()));
-    }
-
-    /**
-     * This function is the helper function of 'newGameAlert'.
-     *
-     * @param checked "don't show this message again" checkbox value
-     */
-    private void newGameAlert2 (boolean checked) {
-        showADRG = !checked;
-        SharedPreferences.Editor editor = prefs.edit();
-        editor.putBoolean("showADRG", showADRG);
-        editor.apply();
-        newGameAlert3();
-    }
-
-    /**
-     * This function is the helper function of 'newGameAlert' & 'newGameAlert2'.
-     */
-    private void newGameAlert3 () {
-        board.setState(true);
-        adRunning = false;
-        ad.dismiss();
-    }
-
     public void goSettings (View view) {
         startActivity(new Intent(MainActivity.this, Settings.class));
     }

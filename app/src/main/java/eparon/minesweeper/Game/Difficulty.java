@@ -12,7 +12,7 @@ public class Difficulty {
      * This function converts a difficulty value to the difficulty position.
      *
      * @param d difficulty value
-     * @return int This returns the given difficulty's position.
+     * @return int; This returns the given difficulty's position.
      */
     public static int valueToPosition (double d) {
         return (int)(6 - d);
@@ -22,10 +22,10 @@ public class Difficulty {
      * This function converts the difficulty's position to the difficulty value.
      *
      * @param i difficulty position
-     * @return int This returns the given difficulty's value.
+     * @return int; This returns the given difficulty's value.
      */
     public static double positionToValue (int i) {
-        double[] difArr = new double[]{EASY, NORMAL, HARD, EXTREME};
+        double[] difArr = new double[] {EASY, NORMAL, HARD, EXTREME};
         return difArr[i];
     }
 

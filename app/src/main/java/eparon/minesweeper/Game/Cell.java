@@ -2,19 +2,17 @@ package eparon.minesweeper.Game;
 
 public class Cell {
 
-    private int value;
-    private boolean revealed;
-    private boolean flagged;
+    private int value = 0;
+    private boolean revealed = false;
+    private boolean flagged = false;
 
     /**
      * Constructor for class Cell
      */
     public Cell () {
-        this.value = 0;
-        this.revealed = false;
-        this.flagged = false;
     }
 
+    //region Get&Set region
     public int getValue () {
         return this.value;
     }
@@ -27,22 +25,23 @@ public class Cell {
         return this.flagged;
     }
 
-    public void setValue (int v) {
-        this.value = v;
+    public void setValue (int val) {
+        this.value = val;
     }
 
-    public void setRevealed (boolean c) {
-        this.revealed = c;
+    public void setRevealed (boolean rvl) {
+        this.revealed = rvl;
     }
 
-    public void setFlagged (boolean f) {
-        this.flagged = f;
+    public void setFlagged (boolean flag) {
+        this.flagged = flag;
     }
+    //endregion
 
     /**
      * This method returns if this cell is a bomb.
      *
-     * @return boolean This returns if this cell is a bomb.
+     * @return boolean; This returns if this cell is a bomb.
      */
     public boolean isBomb () {
         return this.value == -1;
@@ -55,13 +54,6 @@ public class Cell {
         this.value = 0;
         this.revealed = false;
         this.flagged = false;
-    }
-
-    /**
-     * This function add 1 to the value of this cell.
-     */
-    public void plusplus () {
-        this.value++;
     }
 
 }
