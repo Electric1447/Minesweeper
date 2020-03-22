@@ -6,8 +6,8 @@
     <string name="time_msg">Time:</string>
     <string name="bestTime_msg">Best Time:</string>
 
-    <string name="err_invalid_rows">Rows number should be between 9 to 24</string>
-    <string name="err_invalid_cols">Cols number should be between 6 to 16</string>
+    <string name="err_invalid_rows">The amount of rows should be between 9 to 24.</string>
+    <string name="err_invalid_cols">The amount of columns should be between 6 to 16.</string>
 
     <string name="ad_rg_title">Start New Game?</string>
     <string name="ad_rg_message">This will reset your current progress.</string>
@@ -15,7 +15,7 @@
     <string name="ad_rg_negative">No</string>
 
     <string name="ad_oob_title">Warning</string>
-    <string name="ad_oob_message">Some of the Row might be out of the screen.</string>
+    <string name="ad_oob_message">Some rows might be out of the screen.</string>
     <string name="ad_oob_positive">OK</string>
     <string name="ad_oob_negative">Cancel</string>
 
