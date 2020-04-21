@@ -64,7 +64,8 @@ public class Board {
         int counter = 0;
 
         while (bombs != 0) {
-            if (counter >= cols * rows) counter = 0;
+            if (counter >= cols * rows)
+                counter = 0;
 
             if (rnd.nextDouble() < 0.10 && !this.cell[counter / cols][counter % cols].isBomb()
                     && counter != firstCell - 1 - cols && counter != firstCell - cols && counter != firstCell + 1 - cols
@@ -73,6 +74,7 @@ public class Board {
                 this.cell[counter / cols][counter % cols].setValue(-1);
                 bombs--;
             }
+
             counter++;
         }
 

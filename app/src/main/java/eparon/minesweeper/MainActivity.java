@@ -34,7 +34,7 @@ import eparon.minesweeper.Game.Difficulty;
 @SuppressLint({"ClickableViewAccessibility", "SetTextI18n"})
 public class MainActivity extends AppCompatActivity {
 
-    public String PREFS_MS = "MSPrefsFile";
+    public static String PREFS_MS = "MSPrefsFile";
     SharedPreferences prefs;
 
     Board board;
@@ -77,7 +77,8 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed () {
-        if (adRunning) newGameAlert3();
+        if (adRunning)
+            newGameAlert3();
     }
 
     @Override
@@ -93,7 +94,8 @@ public class MainActivity extends AppCompatActivity {
         longpress = prefs.getBoolean("longpress", longpress);
         vibration = prefs.getBoolean("vibration", vibration);
         showADRG = prefs.getBoolean("showADRG", showADRG);
-        for (int i = 0; i < bestTime.length; i++) bestTime[i] = prefs.getInt("bestTime" + i, bestTime[i]);
+        for (int i = 0; i < bestTime.length; i++)
+            bestTime[i] = prefs.getInt("bestTime" + i, bestTime[i]);
 
         board = new Board(rows, cols);
         numberOfBombs = (int)((rows * cols) / difficulty);
@@ -181,9 +183,13 @@ public class MainActivity extends AppCompatActivity {
 
                 if (longpress) ib[r][c].setOnLongClickListener(view -> {
                     Vibrator vibrator = (Vibrator)Objects.requireNonNull(getSystemService(VIBRATOR_SERVICE));
-                    if (vibration && board.getState() && !board.getCell(finalR, finalC).isRevealed())
-                        if (Build.VERSION.SDK_INT >= 26) vibrator.vibrate(VibrationEffect.createOneShot(100, VibrationEffect.DEFAULT_AMPLITUDE));
-                        else vibrator.vibrate(100);
+                    if (vibration && board.getState() && !board.getCell(finalR, finalC).isRevealed()) {
+                        if (Build.VERSION.SDK_INT >= 26)
+                            vibrator.vibrate(VibrationEffect.createOneShot(100, VibrationEffect.DEFAULT_AMPLITUDE));
+                        else
+                            vibrator.vibrate(100);
+                    }
+
                     clickCell(finalR, finalC, !flag);
                     return true;
                 });
@@ -198,13 +204,17 @@ public class MainActivity extends AppCompatActivity {
      * @param clickType the type of the click
      */
     private void clickCell (final int r, final int c, boolean clickType) {
-        if (!board.getState()) return; // If the board is disabled you cannot click a cell.
+        // If the board is disabled you cannot click a cell.
+        if (!board.getState())
+            return;
 
-        if (gameTurn == 0 && !clickType) { // First turn.
+        // First turn.
+        if (gameTurn == 0 && !clickType) {
             startTime = System.currentTimeMillis();
             timerHandler.postDelayed(timerRunnable, 0);
             board.startBoardGeneration(r * cols + c, numberOfBombs);
         }
+
         if (!board.getCell(r, c).isRevealed())
             revealCell(r, c, clickType);
         else if (board.countSurroundingFlags(r, c) >= board.getCell(r, c).getValue())
@@ -220,7 +230,8 @@ public class MainActivity extends AppCompatActivity {
      */
     private void revealCell (int rowPos, int colPos, boolean putFlag) {
         Cell currentCell = board.getCell(rowPos, colPos);
-        if (currentCell.isRevealed()) return; // If the cell has been clicked already.
+        if (currentCell.isRevealed())
+            return; // If the cell has been clicked already.
 
         if (putFlag) { // If the user wants to put a flag on the cell.
             if (currentCell.isFlagged()) {
@@ -233,24 +244,32 @@ public class MainActivity extends AppCompatActivity {
                 currentCell.setFlagged(!currentCell.isFlagged());
             }
             BombsCounter.setText(String.format(Locale.getDefault(), "%02d", flags));
-        } else if (!currentCell.isFlagged()) { // If the user wants to put a bomb on the cell.
+        } else if (!currentCell.isFlagged()) {
+            // If the user wants to put a bomb on the cell.
             currentCell.setRevealed(true); // Reveal the cell;
 
-            if (currentCell.isBomb()) { // User clicked on a bomb -> Lost the game.
+            if (currentCell.isBomb()) {
+                // User clicked on a bomb -> Lost the game.
                 smiley.setImageDrawable(smiley2Drawable);
                 timerHandler.removeCallbacks(timerRunnable);
+
                 for (int r = 0; r < rows; r++)
                     for (int c = 0; c < cols; c++)
-                        if (!board.getCell(r, c).isFlagged()) ib[r][c].setImageDrawable(images[board.getCell(r, c).getValue() + 1]);
-                        else if (!board.getCell(r, c).isBomb()) ib[r][c].setImageDrawable(flag2Drawable);
+                        if (!board.getCell(r, c).isFlagged())
+                            ib[r][c].setImageDrawable(images[board.getCell(r, c).getValue() + 1]);
+                        else if (!board.getCell(r, c).isBomb())
+                            ib[r][c].setImageDrawable(flag2Drawable);
+
                 board.setState(false);
             } else {
                 ib[rowPos][colPos].setImageDrawable(images[currentCell.getValue() + 1]);
-                if (currentCell.getValue() == 0) revealSurroundingCells(rowPos, colPos);
+                if (currentCell.getValue() == 0)
+                    revealSurroundingCells(rowPos, colPos);
             }
 
             gameTurn++;
-            if (gameTurn == rows * cols - numberOfBombs && board.getState()) winGame(); // Win check.
+            if (gameTurn == rows * cols - numberOfBombs && board.getState())
+                winGame(); // Win check.
         }
     }
 
@@ -387,7 +406,8 @@ public class MainActivity extends AppCompatActivity {
         smiley2Drawable = initializeDrawable(R.drawable.smiley2);
         smiley3Drawable = initializeDrawable(R.drawable.smiley3);
 
-        for (int i = 0; i < images.length; i++) images[i] = initializeDrawable(imagesResID[i]);
+        for (int i = 0; i < images.length; i++)
+            images[i] = initializeDrawable(imagesResID[i]);
 
         findViewById(R.id.switchPointer).setBackground(bombDrawable);
         findViewById(R.id.timerll).setBackground(initializeDrawable(R.drawable.timer_background));

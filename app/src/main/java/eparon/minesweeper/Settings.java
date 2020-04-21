@@ -1,6 +1,5 @@
 package eparon.minesweeper;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -24,10 +23,8 @@ import java.util.Locale;
 
 import eparon.minesweeper.Game.Difficulty;
 
-@SuppressLint("SetTextI18n")
 public class Settings extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
-    public String PREFS_FMS = "FMSPrefsFile";
     SharedPreferences prefs;
 
     int rows = 18, cols = 12;
@@ -51,7 +48,7 @@ public class Settings extends AppCompatActivity implements AdapterView.OnItemSel
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
 
-        prefs = getSharedPreferences(PREFS_FMS, Context.MODE_PRIVATE);
+        prefs = getSharedPreferences(MainActivity.PREFS_MS, Context.MODE_PRIVATE);
 
         rows = prefs.getInt("rows", rows);
         cols = prefs.getInt("cols", cols);
@@ -132,8 +129,10 @@ public class Settings extends AppCompatActivity implements AdapterView.OnItemSel
         TypedValue tv = new TypedValue();
         if (getTheme().resolveAttribute(android.R.attr.actionBarSize, tv, true)) abh = TypedValue.complexToDimensionPixelSize(tv.data, getResources().getDisplayMetrics()); // Get ActionBar Size
 
-        if (showADOOB && (size.x / cols) > ((size.y - abh) / rows)) AlertDialogOOB(); // If "Out of bounds" display warning.
-        else Save2();
+        if (showADOOB && ((size.x / cols) > ((size.y - abh) / rows)))
+            AlertDialogOOB(); // If "Out of bounds" display warning.
+        else
+            Save2();
     }
 
     /**
