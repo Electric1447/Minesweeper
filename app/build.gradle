@@ -3,17 +3,22 @@ apply plugin: 'com.android.application'
 android {
     compileSdkVersion 29
     buildToolsVersion "29.0.3"
+
     defaultConfig {
         applicationId "eparon.minesweeper"
         minSdkVersion 21
         targetSdkVersion 29
         versionCode 278
-        versionName "2.7.8_02"
+        versionName "2.7.8_03"
+
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        resConfigs "en"
     }
+
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled true
+            shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
