@@ -1,5 +1,6 @@
 package eparon.minesweeper;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -23,7 +24,7 @@ import java.util.Locale;
 
 import eparon.minesweeper.Game.Difficulty;
 
-public class Settings extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
+public class Settings extends AppCompatActivity {
 
     SharedPreferences prefs;
 
@@ -49,15 +50,14 @@ public class Settings extends AppCompatActivity implements AdapterView.OnItemSel
         setContentView(R.layout.activity_settings);
 
         prefs = getSharedPreferences(MainActivity.PREFS_MS, Context.MODE_PRIVATE);
+        readSharedPreferences();
 
-        rows = prefs.getInt("rows", rows);
-        cols = prefs.getInt("cols", cols);
-        difficulty = Double.parseDouble(prefs.getString("difficulty", String.valueOf(difficulty)));
-        longpress = prefs.getBoolean("longpress", longpress);
-        vibration = prefs.getBoolean("vibration", vibration);
-        showADRG = prefs.getBoolean("showADRG", showADRG);
-        showADOOB = prefs.getBoolean("showADOOB", showADOOB);
+        initializeViews();
+    }
 
+    //region UI & onClick functions
+
+    private void initializeViews () {
         Rows = findViewById(R.id.rText);
         Cols = findViewById(R.id.cText);
         Rows.setHint(String.format(Locale.getDefault(), "%02d", rows));
@@ -67,7 +67,7 @@ public class Settings extends AppCompatActivity implements AdapterView.OnItemSel
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this, R.array.difficulty_array, android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         diffSpinner.setAdapter(adapter);
-        diffSpinner.setOnItemSelectedListener(this);
+        diffSpinner.setOnItemSelectedListener(new DifficultySpinnerItemSelectedListener());
         diffSpinner.setSelection(Difficulty.valueToPosition(difficulty));
 
         longpressCB = findViewById(R.id.cbLongpress);
@@ -80,39 +80,33 @@ public class Settings extends AppCompatActivity implements AdapterView.OnItemSel
         ((TextView)findViewById(R.id.ver)).setText(String.format("Version %s\nCreated by Itai Levin.", BuildConfig.VERSION_NAME)); // Set version TextView.
     }
 
-    //region Spinner select Override functions region
-    @Override
-    public void onItemSelected (AdapterView<?> adapterView, View view, int position, long l) {
-        difficulty = Difficulty.positionToValue(position);
+    @SuppressLint("NonConstantResourceId")
+    public void cbPrefOnClick (View view) {
+        switch (view.getId()) {
+            case R.id.rlLongpress:
+                longpress = changeCheckBoxPref(longpressCB);
+                break;
+            case R.id.rlVibration:
+                vibration = changeCheckBoxPref(vibrationCB);
+                break;
+            case R.id.rlADRG:
+                showADRG = changeCheckBoxPref(adrgCB);
+                break;
+        }
     }
 
-    @Override
-    public void onNothingSelected (AdapterView<?> adapterView) {
-    }
-    //endregion
-
-    //region Click actions region
-    public void setLongpress (View view) {
-        longpressCB.setChecked(!longpressCB.isChecked());
-        longpress = longpressCB.isChecked();
-    }
-
-    public void setVibration (View view) {
-        vibrationCB.setChecked(!vibrationCB.isChecked());
-        vibration = vibrationCB.isChecked();
-    }
-
-    public void setADRG (View view) {
-        adrgCB.setChecked(!adrgCB.isChecked());
-        showADRG = adrgCB.isChecked();
+    private boolean changeCheckBoxPref (CheckBox cb) {
+        cb.setChecked(!cb.isChecked());
+        return cb.isChecked();
     }
 
     public void goBack (View view) {
         Save();
     }
+
     //endregion
 
-    //region Save region
+    //region Save/Load region
 
     /**
      * This method is the main save method.
@@ -172,7 +166,9 @@ public class Settings extends AppCompatActivity implements AdapterView.OnItemSel
         editor.putBoolean("showADOOB", showADOOB);
         editor.apply();
         ad.dismiss();
-        if (result) Save2();
+
+        if (result)
+            Save2();
     }
 
     /**
@@ -195,6 +191,28 @@ public class Settings extends AppCompatActivity implements AdapterView.OnItemSel
             startActivity(new Intent(Settings.this, MainActivity.class));
         }
     }
+
+    private void readSharedPreferences () {
+        rows = prefs.getInt("rows", rows);
+        cols = prefs.getInt("cols", cols);
+        difficulty = Double.parseDouble(prefs.getString("difficulty", String.valueOf(difficulty)));
+        longpress = prefs.getBoolean("longpress", longpress);
+        vibration = prefs.getBoolean("vibration", vibration);
+        showADRG = prefs.getBoolean("showADRG", showADRG);
+        showADOOB = prefs.getBoolean("showADOOB", showADOOB);
+    }
+
     //endregion
+
+    private class DifficultySpinnerItemSelectedListener implements AdapterView.OnItemSelectedListener  {
+        @Override
+        public void onItemSelected (AdapterView<?> adapterView, View view, int position, long l) {
+            difficulty = Difficulty.positionToValue(position);
+        }
+
+        @Override
+        public void onNothingSelected (AdapterView<?> adapterView) {
+        }
+    }
 
 }

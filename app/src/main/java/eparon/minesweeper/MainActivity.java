@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
@@ -23,6 +24,7 @@ import android.widget.PopupWindow;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 
 import java.util.Locale;
 import java.util.Objects;
@@ -184,7 +186,9 @@ public class MainActivity extends AppCompatActivity {
                 if (longpress) ib[r][c].setOnLongClickListener(view -> {
                     Vibrator vibrator = (Vibrator)Objects.requireNonNull(getSystemService(VIBRATOR_SERVICE));
                     if (vibration && board.getState() && !board.getCell(finalR, finalC).isRevealed()) {
-                        if (Build.VERSION.SDK_INT >= 26)
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
+                            vibrator.vibrate(VibrationEffect.createPredefined(VibrationEffect.EFFECT_CLICK));
+                        else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
                             vibrator.vibrate(VibrationEffect.createOneShot(100, VibrationEffect.DEFAULT_AMPLITUDE));
                         else
                             vibrator.vibrate(100);
@@ -210,6 +214,9 @@ public class MainActivity extends AppCompatActivity {
 
         // First turn.
         if (gameTurn == 0 && !clickType) {
+            if (board.isFlagAt(r, c))
+                return;
+
             startTime = System.currentTimeMillis();
             timerHandler.postDelayed(timerRunnable, 0);
             board.startBoardGeneration(r * cols + c, numberOfBombs);
@@ -255,9 +262,9 @@ public class MainActivity extends AppCompatActivity {
 
                 for (int r = 0; r < rows; r++)
                     for (int c = 0; c < cols; c++)
-                        if (!board.getCell(r, c).isFlagged())
+                        if (!board.isFlagAt(r, c))
                             ib[r][c].setImageDrawable(images[board.getCell(r, c).getValue() + 1]);
-                        else if (!board.getCell(r, c).isBomb())
+                        else if (!board.isMineAt(r, c))
                             ib[r][c].setImageDrawable(flag2Drawable);
 
                 board.setState(false);
@@ -358,7 +365,9 @@ public class MainActivity extends AppCompatActivity {
         editor.putBoolean("showADRG", showADRG);
         editor.apply();
         newGameAlert3();
-        if (result) Init();
+
+        if (result)
+            Init();
     }
 
     /**
@@ -388,7 +397,7 @@ public class MainActivity extends AppCompatActivity {
      * @return Drawable; This returns the drawable without the bilinear filter.
      */
     private Drawable initializeDrawable (int resID) {
-        Drawable d = getDrawable(resID);
+        Drawable d = ContextCompat.getDrawable(this, resID);
         assert d != null;
         d.setFilterBitmap(false);
         return d;
@@ -417,7 +426,7 @@ public class MainActivity extends AppCompatActivity {
     /**
      * This function opens the Settings activity.
      */
-    public void goSettings (View view) {
+    public void goToSettings (View view) {
         startActivity(new Intent(MainActivity.this, Settings.class));
     }
 

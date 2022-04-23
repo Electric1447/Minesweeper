@@ -4,7 +4,7 @@ import java.util.Random;
 
 public class Board {
 
-    private Cell[][] cell;
+    private final Cell[][] cell;
     private final int rows;
     private final int cols;
     private boolean state = true;
@@ -122,7 +122,7 @@ public class Board {
      * @param c This is the cell's column
      * @return boolean; This returns if a mine is at cell--[r,c].
      */
-    private boolean isMineAt (final int r, final int c) {
+    public boolean isMineAt (final int r, final int c) {
         if (this.inbounds(r, c))
             return this.cell[r][c].isBomb();
         return false;
@@ -135,7 +135,7 @@ public class Board {
      * @param c This is the cell's column
      * @return boolean; This returns if a flag is at cell--[r,c].
      */
-    private boolean isFlagAt (final int r, final int c) {
+    public boolean isFlagAt (final int r, final int c) {
         if (this.inbounds(r, c))
             return this.cell[r][c].isFlagged();
         return false;
