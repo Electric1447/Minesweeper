@@ -11,7 +11,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
@@ -98,6 +97,12 @@ public class MainActivity extends AppCompatActivity {
         showADRG = prefs.getBoolean("showADRG", showADRG);
         for (int i = 0; i < bestTime.length; i++)
             bestTime[i] = prefs.getInt("bestTime" + i, bestTime[i]);
+
+        findViewById(R.id.settingsButton).setOnClickListener((v) -> startActivity(new Intent(MainActivity.this, Settings.class)));
+        findViewById(R.id.switchPointer).setOnClickListener((v) -> {
+            flag = !flag;
+            v.setBackground(flag ? flagDrawable : bombDrawable);
+        });
 
         board = new Board(rows, cols);
         numberOfBombs = (int)((rows * cols) / difficulty);
@@ -380,14 +385,6 @@ public class MainActivity extends AppCompatActivity {
     }
     //endregion
 
-    /**
-     * This method switches the current click action. (Flag/Bomb), it is called by the button in the titlebar.
-     */
-    public void flagSwitch (View view) {
-        flag = !flag;
-        view.setBackground(flag ? flagDrawable : bombDrawable);
-    }
-
     //region Drawable region
 
     /**
@@ -421,13 +418,7 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.switchPointer).setBackground(bombDrawable);
         findViewById(R.id.timerll).setBackground(initializeDrawable(R.drawable.timer_background));
     }
-    //endregion
 
-    /**
-     * This function opens the Settings activity.
-     */
-    public void goToSettings (View view) {
-        startActivity(new Intent(MainActivity.this, Settings.class));
-    }
+    //endregion
 
 }

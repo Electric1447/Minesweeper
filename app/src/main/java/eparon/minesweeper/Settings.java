@@ -1,6 +1,5 @@
 package eparon.minesweeper;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -14,6 +13,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.PopupWindow;
+import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -36,6 +36,7 @@ public class Settings extends AppCompatActivity {
 
     boolean longpress = true, vibration = true, showADRG = true, showADOOB = true;
     CheckBox longpressCB, vibrationCB, adrgCB;
+    RelativeLayout longpressRL, vibrationRL, adrgRL;
 
     PopupWindow ad;
 
@@ -77,31 +78,20 @@ public class Settings extends AppCompatActivity {
         adrgCB = findViewById(R.id.cbADRG);
         adrgCB.setChecked(showADRG);
 
-        ((TextView)findViewById(R.id.ver)).setText(String.format("Version %s\nCreated by Itai Levin.", BuildConfig.VERSION_NAME)); // Set version TextView.
-    }
+        longpressRL = findViewById(R.id.rlLongpress);
+        longpressRL.setOnClickListener((v) -> longpress = changeCheckBoxPref(longpressCB));
+        vibrationRL = findViewById(R.id.rlVibration);
+        vibrationRL.setOnClickListener((v) -> vibration = changeCheckBoxPref(vibrationCB));
+        adrgRL = findViewById(R.id.rlADRG);
+        adrgRL.setOnClickListener((v) -> showADRG = changeCheckBoxPref(adrgCB));
 
-    @SuppressLint("NonConstantResourceId")
-    public void cbPrefOnClick (View view) {
-        switch (view.getId()) {
-            case R.id.rlLongpress:
-                longpress = changeCheckBoxPref(longpressCB);
-                break;
-            case R.id.rlVibration:
-                vibration = changeCheckBoxPref(vibrationCB);
-                break;
-            case R.id.rlADRG:
-                showADRG = changeCheckBoxPref(adrgCB);
-                break;
-        }
+        ((TextView)findViewById(R.id.versionText)).setText(String.format("Version %s\nCreated by Itai Levin.", BuildConfig.VERSION_NAME)); // Set version TextView.
+        findViewById(R.id.backButton).setOnClickListener((v) -> Save());
     }
 
     private boolean changeCheckBoxPref (CheckBox cb) {
         cb.setChecked(!cb.isChecked());
         return cb.isChecked();
-    }
-
-    public void goBack (View view) {
-        Save();
     }
 
     //endregion
